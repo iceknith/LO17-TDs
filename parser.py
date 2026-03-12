@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from bs4 import Tag
 import xml.etree.cElementTree as ET
+import html
 import re
 import os
 
@@ -22,12 +23,17 @@ def parse_article_date_titre(file_parser:BeautifulSoup, document:ET.Element) -> 
         raise ValueError("No title has been found in the current document !")
 
 def parse_auteur(file_parser:BeautifulSoup, document:ET.Element) -> None:
-    tag = file_parser.find("meta", attrs={"name":"author"})
-    if tag:
-        auteur = ET.SubElement(document, "auteur")
-        auteur.text = str(tag["content"])
-    else:
-        raise ValueError("No author has been found in the current document !")
+    tags = file_parser.find_all("tr")
+    for tag in tags:
+        if ("rédacteur" in tag.text.lower()) and not tag.find("tr"): # Le plus petit tr avec redacteur
+            tag_redacteur = tag.find("span", class_="style95")
+            if tag_redacteur:
+                redacteur = ET.SubElement(document, "auteur")
+                redacteur.text = html.unescape(tag_redacteur.text).split(" - ")[1]
+                return
+            
+            else: raise ValueError("No author has been found in the current document !") 
+    raise ValueError("No author has been found in the current document !")
 
 def parse_bulletin(file_name:str, document:ET.Element):
     bulletin = ET.SubElement(document, "bulletin")
@@ -100,14 +106,13 @@ def parse_file(file_name:str, document:ET.Element):
     with open(file_name, encoding="utf-8") as file_:
         file_parser = BeautifulSoup(file_, "html.parser", from_encoding="utf-8")
         
-        #parse_article_date_titre(file_parser, document)
-        #parse_bulletin(file_name, document)
-        #parse_rubriques(file_parser, document)
-        #parse_auteur(file_parser, document)
+        parse_article_date_titre(file_parser, document)
+        parse_bulletin(file_name, document)
+        parse_rubriques(file_parser, document)
+        parse_auteur(file_parser, document)
         parse_texte(file_parser, document)
-        #parse_images(file_parser, document)
-        #parse_contact(file_parser, document)
-        
+        parse_images(file_parser, document)
+        parse_contact(file_parser, document)
 
 def debug():
     document = ET.Element("debug")
