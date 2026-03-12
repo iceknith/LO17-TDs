@@ -64,13 +64,23 @@ def parse_texte(file_parser:BeautifulSoup, document:ET.Element) -> None:
     else: raise ValueError("No text container has been found in the current document !")
     
 def parse_images(file_parser:BeautifulSoup, document:ET.Element) -> None:
-    image_tag:Tag = file_parser.find_all("img")
+    tags:Tag = file_parser.find_all("div", style="text-align: center")
     
     images_doc = ET.SubElement(document, "images")
     urls = []
-    
-    for image in image_tag:
+    for tag in tags:
         
+        image = tag.find("img")
+        legende = tag.find("span", class_="style21")
+        
+        if image and legende:
+            image_doc = ET.SubElement(images_doc, "image")
+            url_doc = ET.SubElement(image_doc, "urlImage")
+            legende_doc = ET.SubElement(image_doc, "legendeImage")
+            
+            url_doc.text = "/IMAGESWEB" + image["src"].split("IMAGESWEB")[-1]
+            legende_doc.text = html.unescape(legende.text)
+        """
         if image.get("src") and not (image["src"] in urls): 
             image_doc = ET.SubElement(images_doc, "image")
             url_doc = ET.SubElement(image_doc, "urlImage")
@@ -83,6 +93,7 @@ def parse_images(file_parser:BeautifulSoup, document:ET.Element) -> None:
             elif image.get("alt"):
                 legende_doc = ET.SubElement(image_doc, "legendeImage")
                 legende_doc.text = image["alt"]
+        """
         
 def parse_contact(file_parser:BeautifulSoup, document:ET.Element) -> None:
     tags_td:Tag = file_parser.find_all("td", class_="FWExtra2")
@@ -116,7 +127,7 @@ def parse_file(file_name:str, document:ET.Element):
 
 def debug():
     document = ET.Element("debug")
-    parse_file("BULLETINS/75457.htm", document)
+    parse_file("BULLETINS/72933.htm", document)
     print(ET.tostring(document))
 
 def parse_every_file(folder_name:str):
