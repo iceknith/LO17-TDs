@@ -3,6 +3,7 @@ from bs4 import Tag
 import xml.etree.cElementTree as ET
 import re
 import os
+import html
 
 def parse_article_date_titre(file_parser:BeautifulSoup, document:ET.Element) -> None:
     tag = file_parser.find("title")
@@ -11,7 +12,7 @@ def parse_article_date_titre(file_parser:BeautifulSoup, document:ET.Element) -> 
         if len(text) != 3: raise ValueError("Document title doesn't fit the data type")
         
         date = ET.SubElement(document, "date")
-        date.text = str(text[0])
+        date.text = html.unescape(text[0])
         
         article = ET.SubElement(document, "article")
         article.text = str(text[1])
@@ -44,19 +45,18 @@ def parse_rubriques(file_parser:BeautifulSoup, document:ET.Element) -> None:
         raise ValueError("No rubrique has been found in the current document !")
 
 def parse_texte(file_parser:BeautifulSoup, document:ET.Element) -> None:
-    tag_td:Tag = file_parser.find("td", class_="FWExtra")
+    tag_td:Tag = file_parser.find("td", class_="FWExtra2")
     if tag_td:
-        tags_txt = tag_td.find("p", class_="style96")
+        tags_txt = tag_td.find("span", class_="style95")
         if tags_txt:
             text_data = ""
-            for tag in tags_txt: text_data += tag.text + "\n"
+            for tag in tags_txt: text_data += tag.text
             
             texte = ET.SubElement(document, "texte")
-            texte.text = str(text_data)
+            texte.text = html.unescape(text_data)
             
-        else: raise ValueError("No text has been found in the current document !")
     else: raise ValueError("No text container has been found in the current document !")
-    
+ 
 def parse_images(file_parser:BeautifulSoup, document:ET.Element) -> None:
     image_tag:Tag = file_parser.find_all("img")
     
@@ -100,13 +100,13 @@ def parse_file(file_name:str, document:ET.Element):
     with open(file_name, encoding="utf-8") as file_:
         file_parser = BeautifulSoup(file_, "html.parser", from_encoding="utf-8")
         
-        #parse_article_date_titre(file_parser, document)
-        #parse_bulletin(file_name, document)
-        #parse_rubriques(file_parser, document)
-        #parse_auteur(file_parser, document)
+        parse_article_date_titre(file_parser, document)
+        parse_bulletin(file_name, document)
+        parse_rubriques(file_parser, document)
+        parse_auteur(file_parser, document)
         parse_texte(file_parser, document)
-        #parse_images(file_parser, document)
-        #parse_contact(file_parser, document)
+        parse_images(file_parser, document)
+        parse_contact(file_parser, document)
         
 
 def debug():
@@ -129,7 +129,7 @@ def parse_every_file(folder_name:str):
 
 def main():
     debug()
-    #parse_every_file("BULLETINS")
+    parse_every_file("BULLETINS")
 
 
 if __name__ == "__main__":
