@@ -6,14 +6,14 @@ import re
 import os
 import html
 
-def parse_bulletin_titre(file_parser:BeautifulSoup, document:ET.Element) -> None:
+def parse_article_titre(file_parser:BeautifulSoup, document:ET.Element) -> None:
     tag = file_parser.find("title")
     if tag:
         text = tag.getText().split(">")
         if len(text) != 3: raise ValueError("Document title doesn't fit the data type")
         
-        bulletin = ET.SubElement(document, "bulletin")
-        bulletin.text = str(text[1]).replace("BE France", "").strip()
+        article = ET.SubElement(document, "article")
+        article.text = str(text[1]).replace("BE France", "").strip()
         
         titre = ET.SubElement(document, "titre")
         titre.text = str(text[2])
@@ -41,8 +41,8 @@ def parse_auteur(file_parser:BeautifulSoup, document:ET.Element) -> None:
             else: raise ValueError("No author has been found in the current document !") 
     raise ValueError("No author has been found in the current document !")
 
-def parse_article(file_name:str, document:ET.Element):
-    bulletin = ET.SubElement(document, "article")
+def parse_bulletin(file_name:str, document:ET.Element):
+    bulletin = ET.SubElement(document, "bulletin")
     bulletin.text = file_name.split("/")[-1].split(".")[0]
 
 def parse_rubriques(file_parser:BeautifulSoup, document:ET.Element) -> None:
@@ -121,9 +121,9 @@ def parse_file(file_name:str, document:ET.Element):
     with open(file_name, encoding="utf-8") as file_:
         file_parser = BeautifulSoup(file_, "html.parser", from_encoding="utf-8")
         
-        parse_bulletin_titre(file_parser, document)
+        parse_article_titre(file_parser, document)
         parse_date(file_parser, document)
-        parse_article(file_name, document)
+        parse_bulletin(file_name, document)
         parse_rubriques(file_parser, document)
         parse_auteur(file_parser, document)
         parse_texte(file_parser, document)
