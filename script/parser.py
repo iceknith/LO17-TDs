@@ -6,14 +6,11 @@ import re
 import os
 import html
 
-def parse_bulletin_date_titre(file_parser:BeautifulSoup, document:ET.Element) -> None:
+def parse_bulletin_titre(file_parser:BeautifulSoup, document:ET.Element) -> None:
     tag = file_parser.find("title")
     if tag:
         text = tag.getText().split(">")
         if len(text) != 3: raise ValueError("Document title doesn't fit the data type")
-        
-        date = ET.SubElement(document, "date")
-        date.text = html.unescape(text[0])
         
         bulletin = ET.SubElement(document, "bulletin")
         bulletin.text = str(text[1]).replace("BE France", "").replace(" ", "")
@@ -22,6 +19,14 @@ def parse_bulletin_date_titre(file_parser:BeautifulSoup, document:ET.Element) ->
         titre.text = str(text[2])
     else:
         raise ValueError("No title has been found in the current document !")
+
+def parse_date(file_parser:BeautifulSoup, document:ET.Element) -> None:
+    tags_txt:Tag = file_parser.find("span", class_="style42")
+    if tags_txt:        
+        date = ET.SubElement(document, "date")
+        date.text = html.unescape(tags_txt.text).strip()
+            
+    else: raise ValueError("No date has been found in the current document !")
 
 def parse_auteur(file_parser:BeautifulSoup, document:ET.Element) -> None:
     tags = file_parser.find_all("tr")
@@ -116,7 +121,8 @@ def parse_file(file_name:str, document:ET.Element):
     with open(file_name, encoding="utf-8") as file_:
         file_parser = BeautifulSoup(file_, "html.parser", from_encoding="utf-8")
         
-        parse_bulletin_date_titre(file_parser, document)
+        parse_bulletin_titre(file_parser, document)
+        parse_date(file_parser, document)
         parse_article(file_name, document)
         parse_rubriques(file_parser, document)
         parse_auteur(file_parser, document)
