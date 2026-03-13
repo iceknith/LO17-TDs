@@ -13,7 +13,7 @@ def parse_bulletin_titre(file_parser:BeautifulSoup, document:ET.Element) -> None
         if len(text) != 3: raise ValueError("Document title doesn't fit the data type")
         
         bulletin = ET.SubElement(document, "bulletin")
-        bulletin.text = str(text[1]).replace("BE France", "").replace(" ", "")
+        bulletin.text = str(text[1]).replace("BE France", "").strip()
         
         titre = ET.SubElement(document, "titre")
         titre.text = str(text[2])
