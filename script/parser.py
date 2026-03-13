@@ -111,7 +111,7 @@ def parse_file(file_name:str, document:ET.Element):
 
 def debug():
     document = ET.Element("debug")
-    parse_file("BULLETINS/75457.htm", document)
+    parse_file("../BULLETINS/75457.htm", document)
     print(ET.tostring(document))
 
 def parse_every_file(folder_name:str):
@@ -124,12 +124,12 @@ def parse_every_file(folder_name:str):
             parse_file(e.path, document)
     
     ET.indent(tree, space="\t", level=0)
-    tree.write('articles.xml', encoding='utf-8')
+    tree.write('../output/articles.xml', encoding='utf-8')
 
 
 def main():
     debug()
-    parse_every_file("BULLETINS")
+    parse_every_file("../BULLETINS")
 
 
 if __name__ == "__main__":
