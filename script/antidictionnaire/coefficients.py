@@ -54,10 +54,10 @@ def calcul_tf_idf(tf_file, idf_file, output_file):
 
 if __name__ == "__main__":
 
-    tokens_file = "../output/tokens.txt"
-    tf_file = "../output/tf.txt"
-    idf_file = "../output/idf.txt"
-    tfidf_file = "../output/tfidf.txt"
+    tokens_file = "output/antidictionnaire/tokens.txt"
+    tf_file = "output/antidictionnaire/tf.txt"
+    idf_file = "output/antidictionnaire/idf.txt"
+    tfidf_file = "output/antidictionnaire/tfidf.txt"
 
     calcul_tf(tokens_file, tf_file)
     calcul_idf(tf_file, idf_file)
