@@ -15,11 +15,18 @@ def substitute_whole_corpus(corpus_file:str, antidict_file:str):
     root = tree.getroot()
     
     for document in root.findall("document"):
+        # Texte & Titre
         for elem_type in ["texte", "titre"]:
             elem = document.find(elem_type)
             elem.text = substitute(elem.text, antidict_file)
+        
+        images = document.find("image")
+        if images:
+            for image in images.findall("image"):
+                elem = image.find("legendeImage")
+                elem.text = substitute(elem.text, antidict_file)
     
-    tree.write("output/articles2.xml", encoding='utf-8')
+    tree.write(corpus_file, encoding='utf-8')
 
 if __name__ == "__main__":
     substitute_whole_corpus("output/articles.xml", "output/antidictionnaire/stopwords.txt")
