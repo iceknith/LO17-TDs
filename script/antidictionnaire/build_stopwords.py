@@ -15,7 +15,7 @@ def build_stopwords(tfidf_file, stopwords_file, seuil=0.1):
         for (token, max_tfidf_val) in stopwords.items():
             # Ajout à l'anti dico si coeff tf idf < seuil
             if max_tfidf_val < seuil:
-                f_out.write(f"{token}  {max_tfidf_val}\n")
+                f_out.write(f"{token}\n")
 
 if __name__ == "__main__":
     build_stopwords("output/antidictionnaire/tfidf.txt", "output/antidictionnaire/stopwords.txt", 2.75)
