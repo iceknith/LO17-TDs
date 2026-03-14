@@ -6,14 +6,14 @@ import re
 import os
 import html
 
-def parse_article_titre(file_parser:BeautifulSoup, document:ET.Element) -> None:
+def parse_bulletin_titre(file_parser:BeautifulSoup, document:ET.Element) -> None:
     tag = file_parser.find("title")
     if tag:
         text = tag.getText().split(">")
         if len(text) != 3: raise ValueError("Document title doesn't fit the data type")
         
-        article = ET.SubElement(document, "article")
-        article.text = str(text[1]).replace("BE France", "").strip()
+        bulletin = ET.SubElement(document, "bulletin")
+        bulletin.text = str(text[1]).replace("BE France", "").strip()
         
         titre = ET.SubElement(document, "titre")
         titre.text = str(text[2])
@@ -41,19 +41,20 @@ def parse_auteur(file_parser:BeautifulSoup, document:ET.Element) -> None:
             else: raise ValueError("No author has been found in the current document !") 
     raise ValueError("No author has been found in the current document !")
 
-def parse_bulletin(file_name:str, document:ET.Element):
-    bulletin = ET.SubElement(document, "bulletin")
-    bulletin.text = file_name.split("/")[-1].split(".")[0]
+def parse_article(file_name:str, document:ET.Element):
+    article = ET.SubElement(document, "article")
+    article.text = file_name.split("/")[-1].split(".")[0]
 
 def parse_rubriques(file_parser:BeautifulSoup, document:ET.Element) -> None:
-    pattern = re.compile(r"_gaq\.push\(\['_setCustomVar', [0-9], 'Type', '")
-    tag = file_parser.find("script", string=pattern)
-    if tag:
-        split_result = re.split(pattern, tag.text)
-        rubrique = ET.SubElement(document, "rubrique")
-        rubrique.text = str(split_result[1].split("'")[0])
+    tag_td:Tag = file_parser.find("td", class_="FWExtra2")
+    if tag_td:
+        tag_rubrique = tag_td.find("span", class_="style42")
+        if tag_rubrique:
+            rubrique = ET.SubElement(document, "rubrique")
+            rubrique.text = tag_rubrique.text
+        else: raise ValueError("No rubrique has been found in the current document !")
     else: 
-        raise ValueError("No rubrique has been found in the current document !")
+        raise ValueError("No rubrique container (same as text container) has been found in the current document !")
 
 def parse_texte(file_parser:BeautifulSoup, document:ET.Element) -> None:
     tag_td:Tag = file_parser.find("td", class_="FWExtra2")
@@ -121,9 +122,9 @@ def parse_file(file_name:str, document:ET.Element):
     with open(file_name, encoding="utf-8") as file_:
         file_parser = BeautifulSoup(file_, "html.parser", from_encoding="utf-8")
         
-        parse_article_titre(file_parser, document)
+        parse_bulletin_titre(file_parser, document)
         parse_date(file_parser, document)
-        parse_bulletin(file_name, document)
+        parse_article(file_name, document)
         parse_rubriques(file_parser, document)
         parse_auteur(file_parser, document)
         parse_texte(file_parser, document)
@@ -133,7 +134,7 @@ def parse_file(file_name:str, document:ET.Element):
 
 def debug():
     document = ET.Element("debug")
-    parse_file("../BULLETINS/75457.htm", document)
+    parse_file("BULLETINS/75457.htm", document)
     print(ET.tostring(document))
 
 def parse_every_file(folder_name:str):
@@ -146,12 +147,12 @@ def parse_every_file(folder_name:str):
             parse_file(e.path, document)
     
     ET.indent(tree, space="\t", level=0)
-    tree.write('../output/articles.xml', encoding='utf-8')
+    tree.write('output/articles.xml', encoding='utf-8')
 
 
 def main():
-    debug()
-    parse_every_file("../BULLETINS")
+    #debug()
+    parse_every_file("BULLETINS")
 
 
 if __name__ == "__main__":
