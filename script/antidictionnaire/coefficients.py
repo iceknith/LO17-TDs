@@ -53,7 +53,6 @@ def calcul_tf_idf(tf_file, idf_file, output_file):
             f_out.write(f"{doc}\t{token}\t{tfidf}\n")
 
 if __name__ == "__main__":
-
     tokens_file = "output/antidictionnaire/tokens.txt"
     tf_file = "output/antidictionnaire/tf.txt"
     idf_file = "output/antidictionnaire/idf.txt"

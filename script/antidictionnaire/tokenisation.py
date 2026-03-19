@@ -20,6 +20,7 @@ def segmente(xml_file, output_file):
             # boucle pour l'écriture de tous les tokens
             for token in tokens:
                 f_out.write(f"{doc_id}\t{token}\n")
+    
 
 if __name__ == "__main__":
-    segmente("output/articles.xml", "output/antidictionnaire/tokens.txt")
+    segmente("output/articles.xml", "output/lemmatisation/tokens.txt")

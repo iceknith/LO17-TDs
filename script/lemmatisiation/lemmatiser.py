@@ -23,17 +23,18 @@ def lemmatize_spacy(xml_file:str="output/articles_raw.xml", output_file:str="out
     
     datas:dict[str,str] = {}
     nlp = spacy.load("fr_core_news_sm")
-    for token in nlp(texte):
+    for token in nlp(texte.lower()):
         # Si il s'agit d'un mot non traité
-        if re.search(r"[a-z]", str(token)) and not datas.get(str(token)):
-            datas[token] = token.lemma_
+        match = re.match(r"\b\w+\b", str(token))
+        if match and not datas.get(str(token)):
+            datas[match.group()] = token.lemma_
         
     with open(output_file, "w", encoding="utf-8") as f_out:
         for pair in datas.items():
             f_out.write(f"{pair[0]}\t{pair[1]}\n")
 
 
-def lemmatize_nltk(tokens_file:str="output/antidictionnaire/tokens.txt", output_file:str="output/lemmatisation/lems_nltk.txt"):
+def lemmatize_nltk(tokens_file:str="output/lemmatisation/tokens.txt", output_file:str="output/lemmatisation/lems_nltk.txt"):
     datas:dict[str,str] = {}
 
     stemmer = FrenchStemmer()
