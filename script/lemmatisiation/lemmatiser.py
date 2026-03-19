@@ -3,29 +3,32 @@ import spacy
 from nltk.stem.snowball import FrenchStemmer
 import re
 
-def lemmatize_spacy(xml_file:str="output/articles_raw.xml", output_file:str="output/lemmatisation/lems_spacy.txt"):
-    tree = ET.parse(xml_file)
-    root = tree.getroot()
-    texte = ""
-    
-    with open(output_file, "w", encoding="utf-8") as f_out:
-        for document in root.findall("document"):
-            doc_id = document.find("article").text
-            # Combiner titre + texte
-            texte += (document.find("titre").text or "") + " " + (document.find("texte").text or "")
-            # Ajouter les légendes des images
-            images = document.find("image")
-            if images:
-                for image in images.findall("image"):
-                    texte += " " + image.find("legendeImage").text
-    
-    datas:dict[str,str] = {}
-    nlp = spacy.load("fr_core_news_sm")
+def lemmatize_text_spacy(texte, nlp, datas):
     for token in nlp(texte.lower()):
         # Si il s'agit d'un mot non traité
         match = re.match(r"\b\w+\b", str(token))
         if match and not datas.get(str(token)):
             datas[match.group()] = token.lemma_
+
+def lemmatize_spacy(xml_file:str="output/articles_raw.xml", output_file:str="output/lemmatisation/lems_spacy.txt"):
+    tree = ET.parse(xml_file)
+    root = tree.getroot()
+    texte = ""
+    
+    datas:dict[str,str] = {}
+    nlp = spacy.load("fr_core_news_sm")
+    
+    with open(output_file, "w", encoding="utf-8") as f_out:
+        for document in root.findall("document"):
+            doc_id = document.find("article").text
+            # Combiner titre + texte
+            if document.find("titre"): lemmatize_text_spacy(document.find("titre").text, nlp, datas)
+            if document.find("texte"): lemmatize_text_spacy(document.find("texte").text, nlp, datas)
+            # Ajouter les légendes des images
+            images = document.find("images")
+            if images != None:
+                for image in images.findall("image"):
+                    lemmatize_text_spacy(image.find("legendeImage").text, nlp, datas)
         
     with open(output_file, "w", encoding="utf-8") as f_out:
         for pair in datas.items():
