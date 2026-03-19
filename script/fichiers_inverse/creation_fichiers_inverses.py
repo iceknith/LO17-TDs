@@ -21,7 +21,28 @@ def creer_fichier_inverse(categorie:str, root:ET.Element, file_name:str, token_p
             out_f.write(f"{token}\t{data_str[:-1]}\n")
 
 def creer_fichier_inverse_desc_imgs(root:ET.Element, file_name:str):
-    pass
+    inverse_dict:dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
+    
+    for document in root.findall("document"):
+        doc_id = document.find("article").text
+        doc_data:str = ""
+        
+        images = document.find("images")
+        if images != None:
+            for image in images.findall("image"):
+                doc_data += " " + image.find("legendeImage").text
+        
+        tokens = re.findall(r"\b\w+\b", doc_data)
+        data_size = len(tokens)
+        for token in tokens:
+            inverse_dict[token][doc_id] = len(re.findall(token, doc_data))/data_size
+    
+    with open(file_name, "w") as out_f:
+        for token,data in inverse_dict.items():
+            data_str:str = ""
+            for doc_id,freq in data.items():
+                data_str += f"{doc_id},{freq};"
+            out_f.write(f"{token}\t{data_str[:-1]}\n")
 
 
 def main(xml_file:str):
@@ -33,6 +54,7 @@ def main(xml_file:str):
     creer_fichier_inverse("auteur", root, "output/fichiers_inverses/auteur.txt")
     creer_fichier_inverse("texte", root, "output/fichiers_inverses/texte.txt")
     creer_fichier_inverse("contact", root, "output/fichiers_inverses/contact.txt")
+    creer_fichier_inverse_desc_imgs(root, "output/fichiers_inverses/image_desc.txt")
 
 
 if __name__ == "__main__":

@@ -20,8 +20,8 @@ def substitute_whole_corpus(corpus_file:str, new_corpus_file:str, antidict_file:
             elem = document.find(elem_type)
             elem.text = substitute(elem.text, antidict_file)
         
-        images = document.find("image")
-        if images:
+        images = document.find("images")
+        if images != None:
             for image in images.findall("image"):
                 elem = image.find("legendeImage")
                 elem.text = substitute(elem.text, antidict_file)

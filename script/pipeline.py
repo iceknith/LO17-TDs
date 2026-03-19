@@ -14,3 +14,6 @@ os.system("python script/lemmatisiation/tokenisation_lemmatisee.py")
 os.system("python script/antidictionnaire/coefficients.py")
 os.system("python script/antidictionnaire/build_stopwords.py")
 os.system("python script/antidictionnaire/filter_corpus.py")
+
+# Création des fichiers inverses
+os.system("python script/fichiers_inverse/creation_fichiers_inverses.py")
