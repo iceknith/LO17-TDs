@@ -52,5 +52,5 @@ def lemmatize_nltk(tokens_file:str="output/lemmatisation/tokens.txt", output_fil
 
 if __name__ == "__main__":
     lemmatize_spacy()
-    #lemmatize_nltk()
+    lemmatize_nltk()
     
