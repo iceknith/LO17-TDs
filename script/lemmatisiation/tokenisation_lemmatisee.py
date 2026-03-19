@@ -13,6 +13,8 @@ def cree_tokens_lemmatisee(token_file:str, lems_file:str, output_file:str):
         with open(output_file, "w") as out_f:
             for line in in_f:
                 doc, token = line.strip().split("\t")
+                if lems.get(token) and "." in lems.get(token):
+                    print(lems.get(token), token)
                 out_f.write(f"{doc}\t{lems.get(token) or token}\n") # If lemmme exist, remplacer le token par son lemme
                 
 
