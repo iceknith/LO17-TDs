@@ -49,8 +49,9 @@ def main(xml_file:str):
     tree = ET.parse(xml_file)
     root = tree.getroot()
     
+    creer_fichier_inverse("rubrique", root, "output/fichiers_inverses/rubrique.txt")
     creer_fichier_inverse("bulletin", root, "output/fichiers_inverses/bulletin.txt")
-    creer_fichier_inverse("date", root, "output/fichiers_inverses/date.txt")
+    creer_fichier_inverse("date", root, "output/fichiers_inverses/date.txt", token_parser=r".*")
     creer_fichier_inverse("auteur", root, "output/fichiers_inverses/auteur.txt")
     creer_fichier_inverse("texte", root, "output/fichiers_inverses/texte.txt")
     creer_fichier_inverse("contact", root, "output/fichiers_inverses/contact.txt")
