@@ -22,6 +22,17 @@ def compare_par_prefixe(m1:str, m2:str,
     while i < min(l1, l2) and m1[i] == m2[i]: i += 1
     return i/max(l1,l2)
 
+def levenstein_distance(m1:str, m2:str) -> int:
+    if len(m1) == 0: return len(m2)
+    if len(m2) == 0: return len(m1)
+    
+    if m1[0] == m2[0]: return levenstein_distance(m1[1:],m2[1:])
+    
+    return 1 + min(
+        levenstein_distance(m1[1:],m2),
+        levenstein_distance(m1,m2[1:]),
+        levenstein_distance(m1[1:],m2[1:])
+    )
 
 def analyseur_main(texte):
     tokens = lemmatize_and_tokenize(texte)
