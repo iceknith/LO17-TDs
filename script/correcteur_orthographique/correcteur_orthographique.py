@@ -3,7 +3,7 @@ import re
 
 RECHERCHE_PREFIXE_SEUIL_MIN = 3
 RECHERCHE_PREFIXE_SEUIL_MAX = 10
-RECHERCHE_PREFIXE_SEUIL_PROXIMITE = 0.2
+RECHERCHE_PREFIXE_SEUIL_PROXIMITE = 0.3
 
 def special_entity(m: str):
     if re.search(r"[a-zA-Z]", m):
@@ -58,7 +58,7 @@ def levenstein_distance(m1:str, m2:str) -> int:
         levenstein_distance(m1[1:],m2[1:])
     )
 
-def analyseur_main(texte, index_file = "script/correcteur_orthographique/index_correcteur.txt"):
+def analyseur_main(texte, index_file = "output/antidictionnaire/tokens_raw.txt"):
     new_request = []
     tokens = lemmatize_and_tokenize(texte)
     for token in tokens:
