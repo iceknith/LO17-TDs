@@ -1,11 +1,12 @@
 import spacy
+import re
 
 RECHERCHE_PREFIXE_SEUIL_MIN = 3
-RECHERCHE_PREFIXE_SEUIL_MAX = 3
+RECHERCHE_PREFIXE_SEUIL_MAX = 10
 RECHERCHE_PREFIXE_SEUIL_PROXIMITE = 0.2
 
 def special_entity(m: str):
-    if m.isalpha:
+    if re.search(r"[a-zA-Z]", m):
       return False
     else: 
       return True
@@ -44,7 +45,7 @@ def compare_par_prefixe(m1:str, m2:str,
     
     i = 0
     while i < min(l1, l2) and m1[i] == m2[i]: i += 1
-    return i/max(l1,l2) <= seuil_proximite
+    return (i/max(l1,l2)) >= seuil_proximite
 
 def levenstein_distance(m1:str, m2:str) -> int:
     if len(m1) == 0: return len(m2)
@@ -63,7 +64,7 @@ def analyseur_main(texte, index_file = "script/correcteur_orthographique/index_c
     tokens = lemmatize_and_tokenize(texte)
     for token in tokens:
        if special_entity(token): new_request.append(token); continue
-       if in_index(token): new_request.append(token); continue
+       if in_index(index_file, token): new_request.append(token); continue
        listecand = candidate_list(index_file, token)
        if len(listecand) == 0: print(f"Le mot \"{token}\" n'est pas reconnu.")
        elif len(listecand) == 1: new_request.append(listecand[0])
@@ -81,5 +82,4 @@ def analyseur_main(texte, index_file = "script/correcteur_orthographique/index_c
 
 if __name__ == "__main__":
     texte = input("Entrez votre requête\n-> ")
-    #texte = "Bonjour ceci est un texte de test"
     analyseur_main(texte)
