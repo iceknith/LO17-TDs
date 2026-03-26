@@ -30,3 +30,4 @@ def substitute_whole_corpus(corpus_file:str, new_corpus_file:str, antidict_file:
 
 if __name__ == "__main__":
     substitute_whole_corpus("output/articles.xml", "output/articles_no_stopwords.xml", "output/antidictionnaire/stopwords.txt")
+    substitute_whole_corpus("output/articles_no_stopwords.xml", "output/articles_no_stopwords.xml", "output/lemmatisation/lems_spacy.txt")

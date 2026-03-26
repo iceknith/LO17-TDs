@@ -9,9 +9,8 @@ def creer_fichier_inverse(categorie:str, root:ET.Element, file_name:str, token_p
         doc_id = document.find("article").text
         doc_data = document.find(categorie).text
         tokens = re.findall(token_parser, doc_data)
-        data_size = len(tokens)
         for token in tokens:
-            inverse_dict[token][doc_id] = len(re.findall(token, doc_data))/data_size
+            inverse_dict[token][doc_id] = len(re.findall(token, doc_data))
     
     with open(file_name, "w") as out_f:
         for token,data in inverse_dict.items():
