@@ -19,8 +19,15 @@ def in_index(index_file:str, m: str):
         return True
     return False
     
-def candidate_list(m: str):
-   return 0
+def candidate_list(index_file: str, m: str):
+  candidate_list = []
+  with open(index_file, "r") as f:
+    for line in f:
+      line = line.strip()
+      if compare_par_prefixe(line, m):
+        candidate_list.append(line)
+  return candidate_list
+
 def lemmatize_and_tokenize(texte:str) -> list[str]:
     nlp = spacy.load("fr_core_news_sm")
     return [token.lemma_.lower() for token in nlp(texte)]
