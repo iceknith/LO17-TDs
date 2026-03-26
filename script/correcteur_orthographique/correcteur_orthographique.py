@@ -21,6 +21,7 @@ def in_index(index_file:str, m: str):
     
 def candidate_list(m: str):
    return 0
+
 def lemmatize_and_tokenize(texte:str) -> list[str]:
     nlp = spacy.load("fr_core_news_sm")
     return [token.lemma_.lower() for token in nlp(texte)]
@@ -28,15 +29,16 @@ def lemmatize_and_tokenize(texte:str) -> list[str]:
 
 def compare_par_prefixe(m1:str, m2:str, 
                         seuil_min:float = RECHERCHE_PREFIXE_SEUIL_MIN,
-                        seuil_max:float = RECHERCHE_PREFIXE_SEUIL_MAX) -> float:
+                        seuil_max:float = RECHERCHE_PREFIXE_SEUIL_MAX,
+                        seuil_proximite:float = RECHERCHE_PREFIXE_SEUIL_PROXIMITE) -> bool:
     l1 = len(m1); l2 = len(m2)
     
-    if (min(l1, l2) <= RECHERCHE_PREFIXE_SEUIL_MIN): return 0
-    if (abs(l1 - l2) >= RECHERCHE_PREFIXE_SEUIL_MAX): return 0
+    if (min(l1, l2) <= seuil_min): return False
+    if (abs(l1 - l2) >= seuil_max): return False
     
     i = 0
     while i < min(l1, l2) and m1[i] == m2[i]: i += 1
-    return i/max(l1,l2)
+    return i/max(l1,l2) <= seuil_proximite
 
 def levenstein_distance(m1:str, m2:str) -> int:
     if len(m1) == 0: return len(m2)
