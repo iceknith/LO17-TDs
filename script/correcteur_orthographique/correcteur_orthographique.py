@@ -7,7 +7,7 @@ RECHERCHE_PREFIXE_SEUIL_PROXIMITE = 0.2
 
 def lemmatize_and_tokenize(texte:str) -> list[str]:
     nlp = spacy.load("fr_core_news_sm")
-    return [str(token).lower for token in nlp(texte)]
+    return [token.lemma_.lower() for token in nlp(texte)]
 
 
 def compare_par_prefixe(m1:str, m2:str, 
@@ -21,3 +21,13 @@ def compare_par_prefixe(m1:str, m2:str,
     i = 0
     while i < min(l1, l2) and m1[i] == m2[i]: i += 1
     return i/max(l1,l2)
+
+
+def analyseur_main(texte):
+    tokens = lemmatize_and_tokenize(texte)
+    print(tokens)
+
+if __name__ == "__main__":
+    #texte = input("Entrez votre requête\n-> ")
+    texte = "Bonjour ceci est un texte de test"
+    analyseur_main(texte)
