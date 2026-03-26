@@ -1,9 +1,13 @@
-
+import spacy
 
 RECHERCHE_PREFIXE_SEUIL_MIN = 3
 RECHERCHE_PREFIXE_SEUIL_MAX = 3
 RECHERCHE_PREFIXE_SEUIL_PROXIMITE = 0.2
 
+
+def lemmatize_and_tokenize(texte:str) -> list[str]:
+    nlp = spacy.load("fr_core_news_sm")
+    return [str(token).lower for token in nlp(texte)]
 
 
 def compare_par_prefixe(m1:str, m2:str, 
