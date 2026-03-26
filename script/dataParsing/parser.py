@@ -35,7 +35,7 @@ def parse_auteur(file_parser:BeautifulSoup, document:ET.Element) -> None:
             tag_redacteur = tag.find("span", class_="style95")
             if tag_redacteur:
                 redacteur = ET.SubElement(document, "auteur")
-                redacteur.text = html.unescape(tag_redacteur.text).split("-")[1].replace(" ", "")
+                redacteur.text = html.unescape(tag_redacteur.text).split(" - ")[1].replace(" ", "")
                 return
             
             else: raise ValueError("No author has been found in the current document !") 

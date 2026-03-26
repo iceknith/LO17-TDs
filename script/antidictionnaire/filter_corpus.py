@@ -20,12 +20,13 @@ def substitute_whole_corpus(corpus_file:str, new_corpus_file:str, antidict_file:
             elem = document.find(elem_type)
             elem.text = substitute(elem.text, antidict_file)
         
+        """
         images = document.find("images")
         if images != None:
             for image in images.findall("image"):
                 elem = image.find("legendeImage")
                 elem.text = substitute(elem.text, antidict_file)
-    
+        """
     tree.write(new_corpus_file, encoding='utf-8')
 
 if __name__ == "__main__":

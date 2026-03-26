@@ -33,7 +33,6 @@ def lemmatize_and_tokenize(texte:str) -> list[str]:
     nlp = spacy.load("fr_core_news_sm")
     return [token.lemma_.lower() for token in nlp(texte)]
 
-
 def compare_par_prefixe(m1:str, m2:str, 
                         seuil_min:float = RECHERCHE_PREFIXE_SEUIL_MIN,
                         seuil_max:float = RECHERCHE_PREFIXE_SEUIL_MAX,

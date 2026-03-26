@@ -3,6 +3,7 @@ from collections import defaultdict
 
 def cree_tokens_lemmatisee(token_file:str, lems_file:str, output_file:str):
     lems:dict[str, str] = defaultdict(str)
+    lems:list[str] = []
     
     with open(lems_file, "r") as in_f:
         for line in in_f:
@@ -15,6 +16,7 @@ def cree_tokens_lemmatisee(token_file:str, lems_file:str, output_file:str):
                 doc, token = line.strip().split("\t")
                 if lems.get(token):
                     out_f.write(f"{doc}\t{lems[token]}\n") # If lemmme exist, remplacer le token par son lemme
+    
                 
 
 if __name__ == "__main__":
