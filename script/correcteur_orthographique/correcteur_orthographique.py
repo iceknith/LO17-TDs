@@ -58,11 +58,28 @@ def levenstein_distance(m1:str, m2:str) -> int:
         levenstein_distance(m1[1:],m2[1:])
     )
 
-def analyseur_main(texte):
+def analyseur_main(texte, index_file = "script/correcteur_orthographique/index_correcteur.txt"):
+    new_request = []
     tokens = lemmatize_and_tokenize(texte)
-    print(tokens)
+    for token in tokens:
+       if special_entity(token): new_request.append(token); continue
+       if in_index(token): new_request.append(token); continue
+       listecand = candidate_list(index_file, token)
+       if len(listecand) == 0: print(f"Le mot \"{token}\" n'est pas reconnu.")
+       elif len(listecand) == 1: new_request.append(listecand[0])
+       else:
+          min_dist = 100
+          min_cand = ""
+          for cand in listecand:
+             dist = levenstein_distance(cand, token)
+             if min_dist > dist:
+                min_dist = dist
+                min_cand = cand
+          new_request.append(min_cand)
+    print(f"La nouvelle requête est: {new_request}")
+            
 
 if __name__ == "__main__":
-    #texte = input("Entrez votre requête\n-> ")
-    texte = "Bonjour ceci est un texte de test"
+    texte = input("Entrez votre requête\n-> ")
+    #texte = "Bonjour ceci est un texte de test"
     analyseur_main(texte)
