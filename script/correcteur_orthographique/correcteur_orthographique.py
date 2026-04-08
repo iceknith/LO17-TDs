@@ -77,6 +77,7 @@ def analyseur_main(texte, index_file = "output/antidictionnaire/tokens_raw.txt")
                 min_cand = cand
           new_request.append(min_cand)
     print(f"La nouvelle requête est: {new_request}")
+    return new_request
             
 
 if __name__ == "__main__":

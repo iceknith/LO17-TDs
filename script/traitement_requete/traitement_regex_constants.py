@@ -37,4 +37,4 @@ r_date_betw = f"entre (le )?{r_date_raw} et (le )?{r_date_raw}" # Between X and 
 # Rubrique #
 ############
 
-rubrique_prefix = "la rubrique "
+rubrique_prefix = "(la rubrique |de la rubrique |dans la rubrique )"

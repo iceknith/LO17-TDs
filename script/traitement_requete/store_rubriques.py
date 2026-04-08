@@ -1,5 +1,4 @@
 import xml.etree.ElementTree as ET
-import re
 
 def store_rubriques(xml_file, output_file):
     tree = ET.parse(xml_file)
