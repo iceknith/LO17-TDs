@@ -1,4 +1,4 @@
-Afficher la liste des articles qui parlent des systèmes embarqués dans la rubrique Horizons Enseignement.
+Afficher a liste des articles qui parlent des systèmes embarqués dans la rubrique Horizons Enseignement.
 Je voudrais les articles qui parlent d’airbus ou du projet Taxibot.
 Je voudrais les articles qui parlent du tennis.
 Je voudrais les articles traitant de la Lune.

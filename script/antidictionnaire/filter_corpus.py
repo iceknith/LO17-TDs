@@ -21,7 +21,7 @@ def substitute_whole_corpus(corpus_file:str, new_corpus_file:str, antidict_file:
             elem.text = substitute(elem.text, antidict_file)
         
         # Mettre les Contacts en minuscule
-        for elem_type in ["contact"]:
+        for elem_type in ["contact", "rubrique"]:
             elem = document.find(elem_type)
             if elem is not None: elem.text = elem.text.lower()
         

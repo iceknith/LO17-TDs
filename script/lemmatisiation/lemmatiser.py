@@ -6,6 +6,7 @@ import re
 def lemmatize_text_spacy(texte, nlp, datas):
     for token in nlp(texte.lower()):
         # Si il s'agit d'un mot non traité
+        if token == "airbus": print("heyyyy")
         match = re.match(r"\b\w+\b", str(token))
         if match and not datas.get(str(token)):
             datas[match.group()] = token.lemma_
@@ -20,10 +21,9 @@ def lemmatize_spacy(xml_file:str="output/articles_raw.xml", output_file:str="out
     
     with open(output_file, "w", encoding="utf-8") as f_out:
         for document in root.findall("document"):
-            doc_id = document.find("article").text
             # Combiner titre + texte
-            if document.find("titre"): lemmatize_text_spacy(document.find("titre").text, nlp, datas)
-            if document.find("texte"): lemmatize_text_spacy(document.find("texte").text, nlp, datas)
+            if document.find("titre") is not None: lemmatize_text_spacy(document.find("titre").text, nlp, datas)
+            if document.find("texte") is not None: lemmatize_text_spacy(document.find("texte").text, nlp, datas)
             # Ajouter les légendes des images
             images = document.find("images")
             if images != None:

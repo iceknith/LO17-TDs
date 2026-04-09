@@ -1,7 +1,7 @@
 from collections import defaultdict
 import numpy as np
 
-def build_stopwords(tfidf_file, lems_file, stopwords_file, seuil=0.1):
+def build_stopwords(tfidf_file, lems_file, stopwords_file, seuil=0.8):
     lems_to_tokens:dict = defaultdict(list)
     stopwords:dict = defaultdict(lambda: np.array([]))
     
@@ -27,4 +27,4 @@ def build_stopwords(tfidf_file, lems_file, stopwords_file, seuil=0.1):
                     f_out.write(f"{token}\t\"\"\n")
 
 if __name__ == "__main__":
-    build_stopwords("output/antidictionnaire/tfidf.txt", "output/lemmatisation/lems_spacy.txt", "output/antidictionnaire/stopwords.txt", 0.8)
+    build_stopwords("output/antidictionnaire/tfidf.txt", "output/lemmatisation/lems_spacy.txt", "output/antidictionnaire/stopwords.txt", 0.7)
