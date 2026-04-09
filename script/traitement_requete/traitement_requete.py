@@ -12,15 +12,6 @@ def load_rubriques(f_inverse_rubrique_file:str="output/fichiers_inverses/rubriqu
     return rubriques
 
 
-def load_lemmes(fichier="output/lemmatisation/lems_spacy.txt") -> dict:
-    lemmes = {}
-    with open(fichier, encoding="utf-8") as f:
-        for line in f:
-            mot, lemme = line.strip().split("\t")
-            lemmes[mot] = lemme
-    return lemmes
-
-
 def extract_contraintes_temporelles(entree:str, resultat:dict) -> str:
     
     ## Négatif ##
@@ -86,55 +77,41 @@ def extract_logical_operators(entree:str, resultat:dict) -> str:
 
     return entree
 
-def extract_mots_clefs(entree:str, resultat:dict, lemmes: dict) -> str:
-    tokens_corriges = correcteur.analyseur_main(entree)
-    """
-    stopwords = {
-        "les", "des", "de", "la", "le", "du", "un", "une",
-        "je", "veux", "voudrais", "articles", "qui", "sur",
-        "dans", "parlant", "traitant", "sont", "est", "et"
-    }
-
-    mots_clefs = []
-
-    for mot in tokens_corriges:
-        if mot not in stopwords:
-            lemme = lemmes.get(mot, mot)
-            mots_clefs.append(lemme)
-    resultat["mots_clefs"] = mots_clefs
-
-    """
-    resultat["mots_clefs[mots_clefs_generaux]"] = tokens_corriges
+def request_stop_words(entree:str) -> str:
+    stop_words = ["je", "afficher", "voudrais"]
+    for stop_word in stop_words:
+        entree = re.sub(r"\b" + stop_word + r"\b", "", entree)
     return entree
-
-def extract_title_mots_clefs(entree:str, resultat:dict, lemmes: dict) -> str:
-    mots_cles_titre = []
-    if " titre " in entree:
-        entree = entree.replace(" le titre contient ", " ") 
-        entree = entree.replace(" le titre évoque ", " ")
-        if " et " in entree:
-            parts = entree.split(" et ")
-            for part in parts:
-                mots_cles_titre += correcteur.analyseur_main(part)
-                entree = entree.replace(part, "")
-        elif "ou" in entree:
-            parts = entree.split(" ou ")
-            for part in parts:
-                mots_cles_titre += correcteur.analyseur_main(part)
-                entree = entree.replace(part, "")
-        else:
-            mots_cles_titre += correcteur.analyseur_main(entree)
-    resultat["mots_clefs[mots_clefs_titre]"] = mots_cles_titre 
-    return entree
-
-def extract_negative_mots_clefs(entree:str, resultat:dict, lemmes: dict) -> str:
+def extract_mots_clefs(entree:str, resultat:dict) -> str:
     mots_cles_negatifs = []
+    mots_cles_titre = []
+    # anti mots clés
     if " pas " in entree:
-        # si négation, récupérer la fin de la phrase avec regex et la passer à traver analyseur main
         negative_text = re.search(r"pas (.+)", entree)
         mots_cles_negatifs += correcteur.analyseur_main(negative_text.group(1))
         entree = entree.replace("pas " + negative_text.group(1), "")
-    resultat["mots_clefs[mots_clefs_negatifs]"] = mots_cles_negatifs 
+        resultat["mots_clefs_negatifs"] = mots_cles_negatifs 
+
+    # mots clés "titre" à séparer du mot clé "contenu""
+    if ("titre" in entree and "contenu" in entree):
+        # on suppose que les mots clés de titre sont avant ceux de contenu
+        titre_part = entree.split("titre")[1].split("contenu")[0]
+        mots_cles_titre += correcteur.analyseur_main(titre_part)
+        entree = entree.replace("titre" + titre_part, "")
+        contenu_part = entree.split("contenu")[1]
+        mots_cles = correcteur.analyseur_main(contenu_part)
+        entree = entree.replace("contenu" + contenu_part, "")
+        resultat["mots_clefs_generaux"] = mots_cles
+        resultat["mots_clefs_titre"] = mots_cles_titre 
+    # cas où il n'y a que "titre"
+    elif "titre" in entree:
+        entree = entree.replace("titre", "")
+        mots_cles_titre += correcteur.analyseur_main(entree)
+        resultat["mots_clefs_titre"] = mots_cles_titre
+    else:
+    # cas où il n'y a que du contenu "par défaut"
+        mots_cles = correcteur.analyseur_main(entree)
+        resultat["mots_clefs_generaux"] = mots_cles
     return entree
 
 def traite_requete(requete:str) -> dict:
@@ -146,7 +123,7 @@ def traite_requete(requete:str) -> dict:
     requete = extract_rubriques(requete, result)
     requete = extract_filtres_structurels(requete, result)
     requete = extract_logical_operators(requete, result)
-    requete = extract_mots_clefs(requete, result, lemmes)
+    requete = extract_mots_clefs(requete, result)
     return result
 
 def main() -> None:
@@ -155,7 +132,6 @@ def main() -> None:
             print(f"{requete}\n{traite_requete(requete)}\n")
     
 rubriques = []
-lemmes = {}
 
 if __name__ == "__main__":
     rubriques = load_rubriques()
