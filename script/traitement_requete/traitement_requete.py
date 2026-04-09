@@ -6,7 +6,7 @@ import traitement_regex_constants as re_const
 def load_rubriques(f_inverse_rubrique_file:str="output/fichiers_inverses/rubrique.txt") -> list[str]:
     rubriques:list[str]
     with open(f_inverse_rubrique_file, encoding="utf8") as f:
-        rubriques = [line.strip().split(" ")[0] for line in f]
+        rubriques = [line.strip().split("\t")[0] for line in f]
     return rubriques
 
 
@@ -20,10 +20,14 @@ def load_lemmes(fichier="output/lemmatisation/lems_spacy.txt") -> dict:
 
 
 def extract_contraintes_temporelles(entree:str, resultat:dict) -> str:
-    ### Négatif ##
     
-    # TODO #
-    # Faire une regex qui capte les contraintes temporelles négatives, et qui les traite
+    ## Négatif ##
+    
+    # Not equal
+    neq_text = re.search(re_const.r_date_neq, entree)
+    if neq_text is not None:
+        entree = entree.replace(neq_text.group(), "")
+        resultat["date_neg"] = re.search(re_const.r_date_raw, neq_text.group()).group()
     
     ## Positif ##
     
@@ -120,6 +124,5 @@ lemmes = {}
 
 if __name__ == "__main__":
     rubriques = load_rubriques()
-    print(rubriques)
     lemmes = load_lemmes()
     main()
