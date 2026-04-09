@@ -1,0 +1,108 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Ceci est un fichier à but utilitaire %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Globalement, je me sert de ce fichier pour noter 
+tout les bouts de phrases valide pour chaque catégorie, 
+pour expliquer mon raisonnement, et faire d'autres trucs funky.
+
+
+%%%%%%%%%
+% Dates %
+%%%%%%%%%
+
+-- Syntaxe:
+Y = 2005
+m = 06
+M = juin
+d = 09
+D = 9
+
+-- Phrases:
+
+--- supérieur à date
+à partir de [Y]
+écrits après [M Y]
+qui date d'après le [d M Y]
+publiés après [d/m/Y]
+
+--- entre date et date
+de [Y]
+de l'année [Y]
+
+du mois de [M Y]
+
+qui datent du [D M Y]
+
+publiés en [M Y]|[Y]
+publiés au mois de [M Y]
+
+écrits en [M Y]|[Y]
+
+entre le [D M Y] et le [D M Y]
+publiés entre [d/m/Y] et [d/m/Y]
+écrits entre [Y] et [Y]
+
+-- Solution employée:
+Faire une grosse regex de tout ça.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Connecteurs Logiques %
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+L'idée c'est de savoir si on peut se démerder d'avoir "juste" des opérateurs logiques globaux (qui portent sur toute la requête)
+ou si on va devoir se débrouiller pour avoir des "OR" qui s'appliquent aux mots clefs.
+
+-- Phrases atypiques (qui n'ont pas un 'AND' généralisé)
+
+--- OR généralisé
+Je voudrais les articles qui parlent d’airbus ou du projet Taxibot.
+Quels sont les articles parlant de la Russie ou du Japon ?
+Je souhaite les rubriques des articles parlant de nutrition ou de vins.
+Quels sont les articles traitant d’informatique ou de réseaux.
+Je cherche les articles qui parlent des alimentations ou des agricultures.
+Quels sont les articles dont le titre contient biocarburant ou le contenu parle des bioénergies ?
+
+-- Truc funky
+Liste des articles qui parlent soit du CNRS, soit des grandes écoles, mais pas de Centrale Paris.
+Articles dont la rubrique est "Horizon Enseignement" mais qui ne parlent pas d’ingénieurs.
+Je voudrais tous les bulletins écrits entre 2012 et 2013 mais pas au mois de juin.
+
+
+On ne peut donc pas avoir de truc du genre " A ou (B et C) "
+Seulement des trucs du style "A et/ou B", "A et/ou B et non C"
+On a donc un opérateur logique global et un opérateur logique négatif qui porte sur des termes
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Traitement des mots clefs %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Avant de traiter les mots clefs avec le module qu'on a fait le TD précédent, 
+il faut détécter si ils sont restreints à une valeur spécifique
+
+
+%%%%%%%%%%%%%%%%%%%
+% Forme de sortie %
+%%%%%%%%%%%%%%%%%%%
+
+Voici à peu près ce à quoi j'imaginerai que la sortie ressemblerait:
+{
+    'mots_cles' : 
+        [liste des mots cles]
+    'mots_cles_titre' : 
+        [liste des mots cles]
+    'anti_mots_cles' : 
+        [liste des mots cles]
+    
+    'rubrique' : 'nom rubrique'
+
+    'date_min' : ''
+    'date_max' : ''
+    'dates_neg' : []
+    
+    'operateur' : 'operateur majoritaire'
+}
+Après c'est juste moi et mon interprétation de la chose
+Et en plus, la liste négatif semble être vachement dure à construire, donc je sais pas trop comment on va se débrouiller :/

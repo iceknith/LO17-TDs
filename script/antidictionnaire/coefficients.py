@@ -31,7 +31,7 @@ def calcul_idf(tf_file, output_file):
     N = len(docs)
 
     with open(output_file, "w", encoding="utf-8") as f_out:
-        for token, dft in df.items():
+        for token, dft in sorted(df.items(), key=lambda e: e[1], reverse=True):
             # calcul de l'idf
             idf = math.log(N / dft)
             f_out.write(f"{token}\t{idf}\n")
