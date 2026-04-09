@@ -30,6 +30,7 @@ r_date_raw = f"({r_year_date}|{r_month_date}|{r_day_date}|{r_MONTH_date}|{r_DAY_
 
 r_date_gt = f"(à partir de |après le ){r_date_raw}" # Greater than X
 r_date_eq = f"(de (l'année)?|du |en ){r_date_raw}" # Equal X
+r_date_neq = f"pas (de (l'année)?|du |en |au mois de ){r_date_raw}" # Not Equal X
 r_date_betw = f"entre (le )?{r_date_raw} et (le )?{r_date_raw}" # Between X and Y
 
 
