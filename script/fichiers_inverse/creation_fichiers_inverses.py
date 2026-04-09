@@ -32,9 +32,8 @@ def creer_fichier_inverse_desc_imgs(root:ET.Element, file_name:str):
                 doc_data += " " + image.find("legendeImage").text
         
         tokens = re.findall(r"\b\w+\b", doc_data)
-        data_size = len(tokens)
         for token in tokens:
-            inverse_dict[token][doc_id] = len(re.findall(token, doc_data))/data_size
+            inverse_dict[token][doc_id] = len(re.findall(token, doc_data))
     
     with open(file_name, "w") as out_f:
         for token,data in inverse_dict.items():
@@ -48,13 +47,13 @@ def main(xml_file:str):
     tree = ET.parse(xml_file)
     root = tree.getroot()
     
-    creer_fichier_inverse("rubrique", root, "output/fichiers_inverses/rubrique.txt")
-    creer_fichier_inverse("bulletin", root, "output/fichiers_inverses/bulletin.txt")
+    creer_fichier_inverse("rubrique", root, "output/fichiers_inverses/rubrique.txt", token_parser=r".*")
+    creer_fichier_inverse("bulletin", root, "output/fichiers_inverses/bulletin.txt", token_parser=r".*")
     creer_fichier_inverse("date", root, "output/fichiers_inverses/date.txt", token_parser=r".*")
-    creer_fichier_inverse("auteur", root, "output/fichiers_inverses/auteur.txt")
     creer_fichier_inverse("texte", root, "output/fichiers_inverses/texte.txt")
-    creer_fichier_inverse("contact", root, "output/fichiers_inverses/contact.txt")
-    creer_fichier_inverse_desc_imgs(root, "output/fichiers_inverses/image_desc.txt")
+    #creer_fichier_inverse("auteur", root, "output/fichiers_inverses/auteur.txt")
+    #creer_fichier_inverse("contact", root, "output/fichiers_inverses/contact.txt")
+    #creer_fichier_inverse_desc_imgs(root, "output/fichiers_inverses/image_desc.txt")
 
 
 if __name__ == "__main__":
