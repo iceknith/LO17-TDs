@@ -58,7 +58,7 @@ def levenstein_distance(m1:str, m2:str) -> int:
         levenstein_distance(m1[1:],m2[1:])
     )
 
-def analyseur_main(texte, index_file = "output/antidictionnaire/tokens_raw.txt"):
+def analyseur_main(texte, index_file = "output/traitement_requete/tokens_no_stopwords.txt"):
     new_request = []
     tokens = lemmatize_and_tokenize(texte)
     for token in tokens:

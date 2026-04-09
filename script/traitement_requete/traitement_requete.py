@@ -6,10 +6,10 @@ import traitement_regex_constants as re_const
 sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]) + "/correcteur_orthographique")
 import correcteur_orthographique as correcteur
 
-def load_rubriques(rubrique_file:str="output/traitement_requete/rubriques.txt") -> list[str]:
+def load_rubriques(f_inverse_rubrique_file:str="output/fichiers_inverses/rubrique.txt") -> list[str]:
     rubriques:list[str]
-    with open(rubrique_file, encoding="utf8") as f:
-        rubriques = f.read().splitlines()
+    with open(f_inverse_rubrique_file, encoding="utf8") as f:
+        rubriques = [line.strip().split(" ")[0] for line in f]
     return rubriques
 
 
@@ -73,22 +73,14 @@ def extract_filtres_structurels(entree:str, resultat:dict) -> str:
     return entree
 
 def extract_logical_operators(entree:str, resultat:dict) -> str:
-    operateurs = []
-
     if " et " in entree:
-        operateurs.append("AND")
+        resultat["operateurs"] = "AND"
         entree = entree.replace(" et ", "")
     
-    if " ou " in entree:
-        operateurs.append("OR")
+    elif " ou " in entree:
+        resultat["operateurs"] = "OR"
         entree = entree.replace(" ou ", "")
 
-    if " sans " in entree or "mais pas" in entree:
-        operateurs.append("NOT")
-        entree = entree.replace(" sans ", " ")
-        entree = entree.replace(" mais pas ", " ")
-
-    resultat["operateurs"] = operateurs
     return entree
 
 def extract_mots_clefs(entree:str, resultat:dict, lemmes: dict) -> str:
@@ -164,5 +156,6 @@ lemmes = {}
 
 if __name__ == "__main__":
     rubriques = load_rubriques()
+    print(rubriques)
     lemmes = load_lemmes()
     main()

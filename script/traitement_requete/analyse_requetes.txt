@@ -90,9 +90,11 @@ il faut détécter si ils sont restreints à une valeur spécifique
 Voici à peu près ce à quoi j'imaginerai que la sortie ressemblerait:
 {
     'mots_cles' : 
-        {'nom_categorie' : [liste des mots cles], ...} # Si les catégories sont spécifiées
-            OU
-        [liste des mots cles] # Sinon
+        [liste des mots cles]
+    'mots_cles_titre' : 
+        [liste des mots cles]
+    'anti_mots_cles' : 
+        [liste des mots cles]
     
     'rubrique' : 'nom rubrique'
 
@@ -100,8 +102,7 @@ Voici à peu près ce à quoi j'imaginerai que la sortie ressemblerait:
     'date_max' : ''
     'dates_neg' : []
     
-    'operateur_maj' : 'operateur majoritaire'
-    'negatifs' : [liste contenant le chemin vers les mots cles negatifs]
+    'operateur' : 'operateur majoritaire'
 }
 Après c'est juste moi et mon interprétation de la chose
 Et en plus, la liste négatif semble être vachement dure à construire, donc je sais pas trop comment on va se débrouiller :/
