@@ -13,7 +13,6 @@ months = ["janvier", "f√©vrier", "mars", "avril", "mai", "juin", "juillet", "ao√
 r_month = "("
 for m in months: r_month += f"{m}|"
 r_month = r_month[:-1] + ")"
-print(r_month)
 r_MONTH = "[0-1][0-9]"
 
 ## Simple Dates ##

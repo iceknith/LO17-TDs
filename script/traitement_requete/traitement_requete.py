@@ -1,6 +1,5 @@
 import sys
 import os
-
 import regex as re
 import traitement_regex_constants as re_const
 sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]) + "/correcteur_orthographique")
@@ -153,7 +152,7 @@ def traite_requete(requete:str) -> dict:
 def main() -> None:
     with open("script/traitement_requete/requetes_possibles.txt","r") as f:
         for requete in f.read().splitlines():
-            print(traite_requete(requete))
+            print(f"{requete}\n{traite_requete(requete)}\n")
     
 rubriques = []
 lemmes = {}

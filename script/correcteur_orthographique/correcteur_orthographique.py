@@ -65,7 +65,7 @@ def analyseur_main(texte, index_file = "output/traitement_requete/tokens_no_stop
        if special_entity(token): new_request.append(token); continue
        if in_index(index_file, token): new_request.append(token); continue
        listecand = candidate_list(index_file, token)
-       if len(listecand) == 0: print(f"Le mot \"{token}\" n'est pas reconnu.")
+       if len(listecand) == 0: pass; #print(f"Le mot \"{token}\" n'est pas reconnu.")
        elif len(listecand) == 1: new_request.append(listecand[0])
        else:
           min_dist = 100
@@ -76,7 +76,7 @@ def analyseur_main(texte, index_file = "output/traitement_requete/tokens_no_stop
                 min_dist = dist
                 min_cand = cand
           new_request.append(min_cand)
-    print(f"La nouvelle requête est: {new_request}")
+    #print(f"La nouvelle requête est: {new_request}")
     return new_request
             
 
