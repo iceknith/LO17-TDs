@@ -1,7 +1,10 @@
+import sys
 import os
+
 import regex as re
-from correcteur_orthographique import analyseur_main
 import traitement_regex_constants as re_const
+sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]) + "/correcteur_orthographique")
+import correcteur_orthographique as correcteur
 
 def load_rubriques(f_inverse_rubrique_file:str="output/fichiers_inverses/rubrique.txt") -> list[str]:
     rubriques:list[str]
@@ -85,7 +88,8 @@ def extract_logical_operators(entree:str, resultat:dict) -> str:
     return entree
 
 def extract_mots_clefs(entree:str, resultat:dict, lemmes: dict) -> str:
-    tokens_corriges = analyseur_main(entree)
+    tokens_corriges = correcteur.analyseur_main(entree)
+    """
     stopwords = {
         "les", "des", "de", "la", "le", "du", "un", "une",
         "je", "veux", "voudrais", "articles", "qui", "sur",
@@ -98,8 +102,40 @@ def extract_mots_clefs(entree:str, resultat:dict, lemmes: dict) -> str:
         if mot not in stopwords:
             lemme = lemmes.get(mot, mot)
             mots_clefs.append(lemme)
-
     resultat["mots_clefs"] = mots_clefs
+
+    """
+    resultat["mots_clefs[mots_clefs_generaux]"] = tokens_corriges
+    return entree
+
+def extract_title_mots_clefs(entree:str, resultat:dict, lemmes: dict) -> str:
+    mots_cles_titre = []
+    if " titre " in entree:
+        entree = entree.replace(" le titre contient ", " ") 
+        entree = entree.replace(" le titre évoque ", " ")
+        if " et " in entree:
+            parts = entree.split(" et ")
+            for part in parts:
+                mots_cles_titre += correcteur.analyseur_main(part)
+                entree = entree.replace(part, "")
+        elif "ou" in entree:
+            parts = entree.split(" ou ")
+            for part in parts:
+                mots_cles_titre += correcteur.analyseur_main(part)
+                entree = entree.replace(part, "")
+        else:
+            mots_cles_titre += correcteur.analyseur_main(entree)
+    resultat["mots_clefs[mots_clefs_titre]"] = mots_cles_titre 
+    return entree
+
+def extract_negative_mots_clefs(entree:str, resultat:dict, lemmes: dict) -> str:
+    mots_cles_negatifs = []
+    if " pas " in entree:
+        # si négation, récupérer la fin de la phrase avec regex et la passer à traver analyseur main
+        negative_text = re.search(r"pas (.+)", entree)
+        mots_cles_negatifs += correcteur.analyseur_main(negative_text.group(1))
+        entree = entree.replace("pas " + negative_text.group(1), "")
+    resultat["mots_clefs[mots_clefs_negatifs]"] = mots_cles_negatifs 
     return entree
 
 def traite_requete(requete:str) -> dict:
