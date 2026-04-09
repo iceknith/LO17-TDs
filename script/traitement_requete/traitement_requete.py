@@ -78,10 +78,11 @@ def extract_logical_operators(entree:str, resultat:dict) -> str:
     return entree
 
 def request_stop_words(entree:str) -> str:
-    stop_words = ["je", "afficher", "voudrais"]
+    stop_words = ["je", "afficher", "voudrais", "articles", "parlent", "quels", "veux", "cherche", "parlant", "souhaite", "liés", "traitant", "quelles", "aimerais", "portent", "listez-moi", "retournez", "nous", "souhaitons"]
     for stop_word in stop_words:
         entree = re.sub(r"\b" + stop_word + r"\b", "", entree)
     return entree
+
 def extract_mots_clefs(entree:str, resultat:dict) -> str:
     mots_cles_negatifs = []
     mots_cles_titre = []
@@ -123,6 +124,7 @@ def traite_requete(requete:str) -> dict:
     requete = extract_rubriques(requete, result)
     requete = extract_filtres_structurels(requete, result)
     requete = extract_logical_operators(requete, result)
+    requete = request_stop_words(requete)
     requete = extract_mots_clefs(requete, result)
     return result
 
@@ -135,5 +137,4 @@ rubriques = []
 
 if __name__ == "__main__":
     rubriques = load_rubriques()
-    lemmes = load_lemmes()
     main()
