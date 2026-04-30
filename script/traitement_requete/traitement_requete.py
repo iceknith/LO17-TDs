@@ -1,9 +1,10 @@
 import sys
 import os
 import regex as re
-import traitement_regex_constants as re_const
-sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]) + "/correcteur_orthographique")
-import correcteur_orthographique as correcteur
+if __name__ == "__main__": sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
+
+import traitement_requete.traitement_regex_constants as re_const
+import correcteur_orthographique.correcteur_orthographique as correcteur
 
 def load_rubriques(f_inverse_rubrique_file:str="output/fichiers_inverses/rubrique.txt") -> list[str]:
     rubriques:list[str]
@@ -18,7 +19,7 @@ def extract_contraintes_temporelles(entree:str, resultat:dict) -> str:
     neq_text = re.search(re_const.r_date_neq, entree)
     if neq_text is not None:
         entree = entree.replace(neq_text.group(), "")
-        resultat["date_neg"] = re.search(f"({re_const.r_date_raw}|{re_const.r_month})", neq_text.group()).group()
+        resultat["date_neg"] = re.search(f"{re_const.r_date_raw}", neq_text.group()).group()
     
     ## Positif ##
     
@@ -93,8 +94,6 @@ def replace_stop_words(entree:str) -> str:
     return re.sub(re_const.r_ponctuation, "", re.sub(re_const.r_stopprefixes, "", re.sub(re_const.r_stopwords, "", entree)))
 
 def extract_mots_clefs(entree:str, resultat:dict) -> str:
-    print(entree)
-    
     mots_cles_negatifs = []
     mots_cles_titre = []
     # anti mots clés
@@ -139,15 +138,12 @@ def traite_requete(requete:str) -> dict:
     requete = extract_mots_clefs(requete, result)
     return result
 
-def main() -> None:
-    global rubriques
-    rubriques = load_rubriques()
-    
+def main() -> None:    
     with open("script/traitement_requete/requetes_possibles.txt","r") as f:
         for requete in f.read().splitlines():
             print(f"{requete}\n{traite_requete(requete)}\n")
     
-rubriques = []
+rubriques = load_rubriques()
 
 if __name__ == "__main__":
     main()
