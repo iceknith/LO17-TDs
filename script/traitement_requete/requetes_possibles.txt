@@ -1,4 +1,4 @@
-Afficher a liste des articles qui parlent des systèmes embarqués dans la rubrique Horizons Enseignement.
+Afficher la liste des articles qui parlent des systèmes embarqués dans la rubrique Horizons Enseignement.
 Je voudrais les articles qui parlent d’airbus ou du projet Taxibot.
 Je voudrais les articles qui parlent du tennis.
 Je voudrais les articles traitant de la Lune.
@@ -17,7 +17,7 @@ je voudrais les articles de la rubrique Focus mentionnant un laboratoire.
 quels sont les articles publiés au mois de novembre 2011 portant sur de la recherche.
 je veux des articles sur la plasturige.
 je voudrais les articles liés à la recherche scientifique publiés en Février 2010.
-Donner les articles qui parlent d’apprentissage et de la rubrique Horizons Ensenseignement
+Donner les articles qui parlent d’apprentissage et de la rubrique Horizons Enseignement.
 Chercher les articles dans le domaine industriel et datés à partir de 2012.
 Rechercher tous les articles sur le CNRS et l’innovation à partir de 2013.
 Je cherche des articles sur les avions.
@@ -57,8 +57,7 @@ quels articles portent à la fois sur les nanotecnologies et les microsatelites.
 Lister tous les articles dont la rubrique est Focus et qui ont des images.
 Quels sont les articles dont le titre évoque la recherche ?
 Articles dont la rubrique est "Horizon Enseignement" mais qui ne parlent pas d’ingénieurs.
-Tous les articles dont la rubrique est "En direct des laboratoires" ou "Focus" et qui évoquent la
-médecine.
+Tous les articles dont la rubrique est "En direct des laboratoires" ou "Focus" et qui évoquent la médecine.
 Je voudrais tous les bulletins écrits entre 2012 et 2013 mais pas au mois de juin.
 Quels sont les articles dont le titre contient le terme "marché" et le mot "projet" ?
 je voudrais les articles dont le titre contient le mot 3D.
@@ -85,4 +84,4 @@ Quels sont les articles dont le titre contient biocarburant ou le contenu parle 
 Quelle sont les articles qui concernent le CEA ?
 Je veux les articles qui parlent philosophie.
 Je veux les articles sans image.
-Retournez les articles dont le titre contient le mot nucléaire.
+Retournez les articles dont le titre contient le mot nucléaire

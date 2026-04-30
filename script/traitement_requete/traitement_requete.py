@@ -11,16 +11,14 @@ def load_rubriques(f_inverse_rubrique_file:str="output/fichiers_inverses/rubriqu
         rubriques = [line.strip().split("\t")[0] for line in f]
     return rubriques
 
-
-def extract_contraintes_temporelles(entree:str, resultat:dict) -> str:
-    
+def extract_contraintes_temporelles(entree:str, resultat:dict) -> str:    
     ## Négatif ##
     
     # Not equal
     neq_text = re.search(re_const.r_date_neq, entree)
     if neq_text is not None:
         entree = entree.replace(neq_text.group(), "")
-        resultat["date_neg"] = re.search(re_const.r_date_raw, neq_text.group()).group()
+        resultat["date_neg"] = re.search(f"({re_const.r_date_raw}|{re_const.r_month})", neq_text.group()).group()
     
     ## Positif ##
     
@@ -34,7 +32,7 @@ def extract_contraintes_temporelles(entree:str, resultat:dict) -> str:
     eq_text = re.search(re_const.r_date_eq, entree)
     if eq_text is not None:
         entree = entree.replace(eq_text.group(), "")
-        resultat["date_min"] = re.search(re_const.r_date_raw, eq_text.group()).group()
+        resultat["date"] = re.search(re_const.r_date_raw, eq_text.group()).group()
     
     # Between
     betw_text = re.search(re_const.r_date_betw, entree)
@@ -48,10 +46,19 @@ def extract_contraintes_temporelles(entree:str, resultat:dict) -> str:
 
 def extract_rubriques(entree:str, resultat:dict) -> str:
     for rubrique in rubriques:
-        if re.search(re_const.rubrique_prefix + rubrique, entree) is not None:
-            resultat["rubrique"] = rubrique
-            entree = re.sub(re_const.rubrique_prefix + rubrique, "", entree)
-            break
+        
+        # Fix d'un edgecase, la rubrique est appelée evénement (car écrit Evénement), or elle devrait s'appeller évènement
+        search = rubrique
+        if rubrique == "evénement": search = "(evénement|évènement|événement)"
+        
+        if re.search(search, entree) is not None:
+            # Ajouter la rubrique à la liste des rubriques
+            if resultat.get("rubriques") is None: resultat["rubriques"] = []
+            resultat["rubriques"].append(rubrique)
+            
+            # Enlever la rubrique de l'entrée
+            entree = re.sub(search, "", entree)
+            entree = re.sub(re_const.rubrique_prefix, "", entree)
     
     return entree
 
@@ -59,7 +66,9 @@ def extract_filtres_structurels(entree:str, resultat:dict) -> str:
     if "sans image" in entree or "pas d'image" in entree:
         resultat["image"] = False
         entree = entree.replace("sans image ", "")
+        entree = entree.replace("sans images ", "")
         entree = entree.replace("pas d'image ", "")
+        entree = entree.replace("pas d'images ", "")
 
     elif "image" in entree:
         resultat["image"] = True
@@ -69,20 +78,23 @@ def extract_filtres_structurels(entree:str, resultat:dict) -> str:
 def extract_logical_operators(entree:str, resultat:dict) -> str:
     if " et " in entree:
         resultat["operateurs"] = "AND"
-        entree = entree.replace(" et ", "")
+        entree = entree.replace(" et", "")
     
     elif " ou " in entree:
         resultat["operateurs"] = "OR"
-        entree = entree.replace(" ou ", "")
+        entree = entree.replace(" ou", "")
 
     return entree
 
-def request_stop_words(entree:str) -> str:
-    stop_words = ["je", "afficher", "voudrais"]
-    for stop_word in stop_words:
-        entree = re.sub(r"\b" + stop_word + r"\b", "", entree)
-    return entree
+def replace_stop_words(entree:str) -> str:
+    #stop_words = ["je", "afficher", "voudrais"]
+    #for stop_word in stop_words:
+    #    entree = re.sub(r"" + stop_word + r"\b", "", entree)
+    return re.sub(re_const.r_ponctuation, "", re.sub(re_const.r_stopprefixes, "", re.sub(re_const.r_stopwords, "", entree)))
+
 def extract_mots_clefs(entree:str, resultat:dict) -> str:
+    print(entree)
+    
     mots_cles_negatifs = []
     mots_cles_titre = []
     # anti mots clés
@@ -90,7 +102,7 @@ def extract_mots_clefs(entree:str, resultat:dict) -> str:
         negative_text = re.search(r"pas (.+)", entree)
         mots_cles_negatifs += correcteur.analyseur_main(negative_text.group(1))
         entree = entree.replace("pas " + negative_text.group(1), "")
-        resultat["mots_clefs_negatifs"] = mots_cles_negatifs 
+        if len(mots_cles_negatifs) > 0: resultat["mots_clefs_negatifs"] = mots_cles_negatifs 
 
     # mots clés "titre" à séparer du mot clé "contenu""
     if ("titre" in entree and "contenu" in entree):
@@ -101,17 +113,17 @@ def extract_mots_clefs(entree:str, resultat:dict) -> str:
         contenu_part = entree.split("contenu")[1]
         mots_cles = correcteur.analyseur_main(contenu_part)
         entree = entree.replace("contenu" + contenu_part, "")
-        resultat["mots_clefs_generaux"] = mots_cles
-        resultat["mots_clefs_titre"] = mots_cles_titre 
+        if len(mots_cles) > 0: resultat["mots_clefs_generaux"] = mots_cles
+        if len(mots_cles_titre) > 0: resultat["mots_clefs_titre"] = mots_cles_titre 
     # cas où il n'y a que "titre"
     elif "titre" in entree:
         entree = entree.replace("titre", "")
         mots_cles_titre += correcteur.analyseur_main(entree)
-        resultat["mots_clefs_titre"] = mots_cles_titre
+        if len(mots_cles_titre) > 0: resultat["mots_clefs_titre"] = mots_cles_titre
     else:
     # cas où il n'y a que du contenu "par défaut"
         mots_cles = correcteur.analyseur_main(entree)
-        resultat["mots_clefs_generaux"] = mots_cles
+        if len(mots_cles) > 0: resultat["mots_clefs_generaux"] = mots_cles
     return entree
 
 def traite_requete(requete:str) -> dict:
@@ -123,10 +135,14 @@ def traite_requete(requete:str) -> dict:
     requete = extract_rubriques(requete, result)
     requete = extract_filtres_structurels(requete, result)
     requete = extract_logical_operators(requete, result)
+    requete = replace_stop_words(requete)
     requete = extract_mots_clefs(requete, result)
     return result
 
 def main() -> None:
+    global rubriques
+    rubriques = load_rubriques()
+    
     with open("script/traitement_requete/requetes_possibles.txt","r") as f:
         for requete in f.read().splitlines():
             print(f"{requete}\n{traite_requete(requete)}\n")
@@ -134,6 +150,4 @@ def main() -> None:
 rubriques = []
 
 if __name__ == "__main__":
-    rubriques = load_rubriques()
-    lemmes = load_lemmes()
     main()

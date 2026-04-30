@@ -62,6 +62,7 @@ def analyseur_main(texte, index_file = "output/traitement_requete/tokens_no_stop
     new_request = []
     tokens = lemmatize_and_tokenize(texte)
     for token in tokens:
+       if " " in token: continue # On ne traite pas les requêtes avec des espaces
        if special_entity(token): new_request.append(token); continue
        if in_index(index_file, token): new_request.append(token); continue
        listecand = candidate_list(index_file, token)
