@@ -60,6 +60,7 @@ def date_to_regex(date:str) -> str:
     return f"{day}/{month}/{year}"
 
 def is_later(date1:str, date2:str) -> bool:
+    """Returns true if Date2 >= Date2"""
     date_decomposed1 = date1.split("/")
     day1 = date_decomposed1[0]
     month1 = date_decomposed1[1]
@@ -71,13 +72,13 @@ def is_later(date1:str, date2:str) -> bool:
     year2 = date_decomposed2[2]
     
     if year1 == ".." or year2 == "..": return False
-    if year1 != year2: return int(year1) > int(year2)
+    if year1 != year2: return int(year1) < int(year2)
     
     if month1 == ".." or month2 == "..": return False
-    if month1 != month2: return int(month1) > int(month2)
+    if month1 != month2: return int(month1) < int(month2)
     
     if day1 == ".." or day2 == "..": return False
-    return int(day1) >= int(day2)
+    return int(day1) <= int(day2)
 
 ##########################
 ## Création Contraintes ##
@@ -119,7 +120,7 @@ def create_rubrique_contraintes(requete:dict, contraintes:dict) -> list:
 
 def create_contenu_contraintes(requete:dict, contraintes:dict) -> list:
     if requete.get("mots_clefs_generaux") is not None:
-        contraintes[f"{fichiers_inverses_path}/contenu.txt"] = requete.get("mots_clefs_generaux")
+        contraintes[f"{fichiers_inverses_path}/texte.txt"] = requete.get("mots_clefs_generaux")
 
 def create_titre_contraintes(requete:dict, contraintes:dict) -> dict:
     if requete.get("mots_clefs_titres") is not None:
@@ -149,11 +150,58 @@ def create_contraintes(requete:dict) -> dict:
 ## Application Contraintes ##
 #############################
 
-def apply_contrainte(content:str) -> bool:
-    pass
+def read_inverted_file(file_name:str) -> dict:
+    resultat:dict = {}
+    
+    with open(file_name, "r") as f:
+        for line in f:
+            token = line.split("\t")[0]
+            articles = {article.split(",")[0] for article in line.split("\t")[1].split(";")}
+            resultat[token] = articles
+    
+    return resultat
 
-def apply_contraintes(contraintes:dict) -> list[str]:
-    pass
+def apply_contrainte_to_file(file_data:dict, content:str, neg:bool=False, is_valid:callable=re.search, ope='AND') -> set[str]:
+    resultat:set = set()
+    
+    for token in file_data.keys():
+        if apply_contrainte_to_token(token, content, neg, is_valid):
+            resultat = resultat.union(file_data[token])
+    
+    return resultat
+
+def apply_contrainte_to_token(token:str, content:str, neg:bool=False, is_valid:callable=re.search) -> bool:
+    result:bool = bool(is_valid(content, token))
+    
+    if neg: return not result
+    else: return result
+
+def unification(liste1:set[str], liste2:set[str], ope:bool='AND') -> set[str]:
+    if ope == 'AND': return liste1.intersection(liste2)
+    if ope == 'OR': return liste1.union(liste2)
+
+def apply_contraintes(contraintes:dict) -> set[str]:
+    resultat:set = None
+    default_ope = contraintes['ope']
+    contraintes.pop('ope')
+    
+    for file_name, contrainte_list in contraintes.items():
+        file_data = read_inverted_file(file_name)
+        for contrainte in contrainte_list:
+            ope:str = default_ope
+            contrainte_resultat:set[str]
+            
+            if type(contrainte) == str:
+                contrainte_resultat = apply_contrainte_to_file(file_data, contrainte)
+            if type(contrainte) == dict:
+                contrainte_resultat = apply_contrainte_to_file(file_data, **contrainte)
+                ope = contrainte.get('ope', default_ope)
+                
+            if resultat is not None: resultat = unification(resultat, contrainte_resultat, ope)
+            else: resultat = contrainte_resultat
+    
+    return resultat
+                
 
 ##########
 ## Main ##
@@ -161,11 +209,14 @@ def apply_contraintes(contraintes:dict) -> list[str]:
 
 def process_requete(requete_str:str) -> list[str]:
     requete:dict = traite_requete(requete_str)
-    print(requete)
+    print(f"Requête: {requete}")
     contraintes:dict = create_contraintes(requete)
-    print(contraintes)
+    #contraintes:dict = create_contraintes({'date_min': '3 mars 2013', 'date_max': '4 mai 2013'})
+    print(f"Contraintes: {contraintes}")
     resultat:list[str] = apply_contraintes(contraintes)
+    print(f"Résultat: {resultat}")
     return resultat
 
 if __name__ == "__main__":
-    process_requete("Quels sont les articles parus entre le 3 mars 2013 et le 4 mai 2013 évoquant les Etats-Unis ?")
+    process_requete(input("Entrez votre requête\n-> "))
+    #process_requete("Quels sont les articles parus entre le 3 mars 2011 et le 4 mai 2013 évoquant les Etats-Unis ?")

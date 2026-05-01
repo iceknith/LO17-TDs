@@ -77,10 +77,11 @@ def analyseur_main(texte, index_file = "output/traitement_requete/tokens_no_stop
                 min_dist = dist
                 min_cand = cand
           new_request.append(min_cand)
-    #print(f"La nouvelle requête est: {new_request}")
+    print(f"La nouvelle requête est: {new_request}")
     return new_request
             
 
 if __name__ == "__main__":
-    texte = input("Entrez votre requête\n-> ")
-    analyseur_main(texte)
+    #texte = input("Entrez votre requête\n-> ")
+    #analyseur_main(texte)
+    analyseur_main("etats-unis")
