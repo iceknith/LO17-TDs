@@ -26,7 +26,7 @@ def day_to_DAY(day:str) -> str:
 def date_to_regex(date:str) -> str:
     day = ".."
     month = ".."
-    year = "20[0-9]{2}*"
+    year = "20.."
     
     # Trouver le format de la date
     if re.search(f"^{re_const.r_year_date}$", date): # year
@@ -132,7 +132,7 @@ def create_contenu_contraintes(requete:dict, contraintes:dict) -> list:
     contraintes[f"{fichiers_inverses_path}/texte.txt"] = contraintes_contenu
 
 def create_titre_contraintes(requete:dict, contraintes:dict) -> dict:
-    if requete.get("mots_clefs_titres") is not None:
+    if requete.get("mots_clefs_titre") is not None:
         contraintes[f"{fichiers_inverses_path}/titre.txt"] = requete.get("mots_clefs_titre")
 
 def create_image_contraintes(requete:dict, contraintes:dict) -> dict:
@@ -243,4 +243,4 @@ def process_requete(requete_str:str) -> list[str]:
 
 if __name__ == "__main__":
     #process_requete(input("Entrez votre requête\n-> "))
-    process_requete("Je voudrais les articles qui parlent d’airbus ou du projet Taxibot.")
+    process_requete("J’aimerais la liste des articles écrits après janvier 2014 et qui parlent d’informatique ou de télécommunications.")

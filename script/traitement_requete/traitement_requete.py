@@ -77,13 +77,14 @@ def extract_filtres_structurels(entree:str, resultat:dict) -> str:
     return entree
 
 def extract_logical_operators(entree:str, resultat:dict) -> str:
-    if " et " in entree:
+    if " ou " in entree:
+        resultat["operateurs"] = "OR"
+        entree = entree.replace(" ou", "")
+    
+    elif " et " in entree:
         resultat["operateurs"] = "AND"
         entree = entree.replace(" et", "")
     
-    elif " ou " in entree:
-        resultat["operateurs"] = "OR"
-        entree = entree.replace(" ou", "")
 
     return entree
 
@@ -147,3 +148,4 @@ rubriques = load_rubriques()
 
 if __name__ == "__main__":
     main()
+    
