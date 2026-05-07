@@ -25,13 +25,6 @@ def substitute_whole_corpus(corpus_file:str, new_corpus_file:str, antidict_file:
             elem = document.find(elem_type)
             if elem is not None: elem.text = elem.text.lower()
         
-        """
-        images = document.find("images")
-        if images != None:
-            for image in images.findall("image"):
-                elem = image.find("legendeImage")
-                elem.text = substitute(elem.text, antidict_file)
-        """
     tree.write(new_corpus_file, encoding='utf-8')
 
 def substitute_tokens(tokens_file:str, new_tokens_file:str, antidict_file:str):

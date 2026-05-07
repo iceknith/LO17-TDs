@@ -211,7 +211,7 @@ def apply_contraintes(contraintes:dict) -> set[str]:
                 else: resultat_and.intersection_update(contrainte_resultat)
             elif ope == 'OR':
                 if resultat_or is None: resultat_or = contrainte_resultat
-                else: resultat_or = resultat_or.update(contrainte_resultat)
+                else: resultat_or.update(contrainte_resultat)
     
     # We force-add the and on top of the or
     resultat:set
