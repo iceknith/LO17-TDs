@@ -94,6 +94,6 @@ def choose_lemmatize_method(sample_size=200):
 
 if __name__ == "__main__":
     lemmatize_spacy()
-    lemmatize_nltk()
-    choose_lemmatize_method()
+    #lemmatize_nltk()
+    #choose_lemmatize_method()
     

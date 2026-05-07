@@ -116,11 +116,20 @@ def create_date_contraintes(requete:dict, contraintes:dict) -> dict:
 
 def create_rubrique_contraintes(requete:dict, contraintes:dict) -> list:
     if requete.get("rubriques") is not None:
-        contraintes[f"{fichiers_inverses_path}/rubriques.txt"] = requete.get("rubriques")
+        contraintes[f"{fichiers_inverses_path}/rubrique.txt"] = requete.get("rubriques")
 
 def create_contenu_contraintes(requete:dict, contraintes:dict) -> list:
+    contraintes_contenu = []
     if requete.get("mots_clefs_generaux") is not None:
-        contraintes[f"{fichiers_inverses_path}/texte.txt"] = requete.get("mots_clefs_generaux")
+        contraintes_contenu = requete.get("mots_clefs_generaux")
+    
+    if requete.get("mots_clefs_negatifs") is not None:
+        for mot_neg in requete.get("mots_clefs_negatifs"):
+            contraintes_contenu.append(
+                {'neg':True, 'ope':'AND', 'is_valid':re.search, 'content':mot_neg}
+            )
+    
+    contraintes[f"{fichiers_inverses_path}/texte.txt"] = contraintes_contenu
 
 def create_titre_contraintes(requete:dict, contraintes:dict) -> dict:
     if requete.get("mots_clefs_titres") is not None:
@@ -161,7 +170,7 @@ def read_inverted_file(file_name:str) -> dict:
     
     return resultat
 
-def apply_contrainte_to_file(file_data:dict, content:str, neg:bool=False, is_valid:callable=re.search, ope='AND') -> set[str]:
+def apply_contrainte_to_file(file_data:dict, content:str, neg:bool=False, is_valid:callable=re.search) -> set[str]:
     resultat:set = set()
     
     for token in file_data.keys():
@@ -181,9 +190,9 @@ def unification(liste1:set[str], liste2:set[str], ope:bool='AND') -> set[str]:
     if ope == 'OR': return liste1.union(liste2)
 
 def apply_contraintes(contraintes:dict) -> set[str]:
-    resultat:set = None
-    default_ope = contraintes['ope']
-    contraintes.pop('ope')
+    resultat_and:set = None
+    resultat_or:set = None
+    default_ope = contraintes.pop('ope', 'AND')
     
     for file_name, contrainte_list in contraintes.items():
         file_data = read_inverted_file(file_name)
@@ -194,11 +203,26 @@ def apply_contraintes(contraintes:dict) -> set[str]:
             if type(contrainte) == str:
                 contrainte_resultat = apply_contrainte_to_file(file_data, contrainte)
             if type(contrainte) == dict:
+                ope = contrainte.pop('ope', default_ope)
                 contrainte_resultat = apply_contrainte_to_file(file_data, **contrainte)
-                ope = contrainte.get('ope', default_ope)
-                
-            if resultat is not None: resultat = unification(resultat, contrainte_resultat, ope)
-            else: resultat = contrainte_resultat
+            
+            if ope == 'AND':
+                if resultat_and is None: resultat_and = contrainte_resultat
+                else: resultat_and.intersection_update(contrainte_resultat)
+            elif ope == 'OR':
+                if resultat_and is None: resultat_and = contrainte_resultat
+                else: resultat_or = resultat_or.update(contrainte_resultat)
+    
+    # We force-add the and on top of the or
+    resultat:set
+    
+    if resultat_or is None:
+        resultat = resultat_and
+    elif resultat_and is None:
+        resultat = resultat_or
+    # If both are present, the and is dominant
+    else:
+        resultat = resultat_and.intersection(resultat_or)
     
     return resultat
                 
@@ -218,5 +242,5 @@ def process_requete(requete_str:str) -> list[str]:
     return resultat
 
 if __name__ == "__main__":
-    process_requete(input("Entrez votre requête\n-> "))
-    #process_requete("Quels sont les articles parus entre le 3 mars 2011 et le 4 mai 2013 évoquant les Etats-Unis ?")
+    #process_requete(input("Entrez votre requête\n-> "))
+    process_requete("Afficher la liste des articles qui parlent des systèmes embarqués dans la rubrique Horizons Enseignement.")

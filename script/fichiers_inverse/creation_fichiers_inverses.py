@@ -2,7 +2,7 @@ from collections import defaultdict
 import xml.etree.ElementTree as ET
 import re
 
-def creer_fichier_inverse(categorie:str, root:ET.Element, file_name:str, token_parser=r"\b[a-zA-Z0-9-_]+\b"):
+def creer_fichier_inverse(categorie:str, root:ET.Element, file_name:str, token_parser=r"\b[\w-]+\b"):
     inverse_dict:dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
     
     for document in root.findall("document"):
@@ -32,7 +32,7 @@ def creer_fichier_inverse_desc_imgs(root:ET.Element, file_name:str):
             for image in images.findall("image"):
                 doc_data += " " + image.find("legendeImage").text
         
-        tokens = re.findall(r"\b[a-zA-Z0-9-_]+\b", doc_data)
+        tokens = re.findall(r"\b[\w-]+\b", doc_data)
         for token in tokens:
             inverse_dict[token][doc_id] = len(re.findall(token, doc_data))
     
