@@ -43,6 +43,6 @@ def substitute_tokens(tokens_file:str, new_tokens_file:str, antidict_file:str):
         f.write(text)
 
 if __name__ == "__main__":
-    substitute_whole_corpus("output/articles.xml", "output/articles_no_stopwords.xml", "output/antidictionnaire/stopwords.txt")
+    substitute_whole_corpus("output/articles_lemmatisees.xml", "output/articles_no_stopwords.xml", "output/antidictionnaire/stopwords.txt")
     substitute_tokens("output/antidictionnaire/tokens_raw.txt", "output/traitement_requete/tokens_no_stopwords.txt", "output/antidictionnaire/stopwords.txt")
     #substitute_whole_corpus("output/articles_no_stopwords.xml", "output/articles_no_stopwords.xml", "output/lemmatisation/lems_spacy.txt")
