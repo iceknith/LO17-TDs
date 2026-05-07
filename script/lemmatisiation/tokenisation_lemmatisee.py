@@ -40,7 +40,7 @@ def cree_tokens_lemmatisee(token_file:str, lems_file:str, corpus_file:str, new_c
             texte = document.find("texte")
             
             titre.text = titre.text.replace("'", " ")
-            texte.text = titre.text.replace("'", " ")
+            texte.text = texte.text.replace("'", " ")
             
             for token,lemme in article_tokens_to_replace[article_num.text]:
                 titre.text = re.sub(r"\b"+token+r"\b", lemme, titre.text)

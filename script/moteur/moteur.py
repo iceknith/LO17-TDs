@@ -210,7 +210,7 @@ def apply_contraintes(contraintes:dict) -> set[str]:
                 if resultat_and is None: resultat_and = contrainte_resultat
                 else: resultat_and.intersection_update(contrainte_resultat)
             elif ope == 'OR':
-                if resultat_and is None: resultat_and = contrainte_resultat
+                if resultat_or is None: resultat_or = contrainte_resultat
                 else: resultat_or = resultat_or.update(contrainte_resultat)
     
     # We force-add the and on top of the or
@@ -243,4 +243,4 @@ def process_requete(requete_str:str) -> list[str]:
 
 if __name__ == "__main__":
     #process_requete(input("Entrez votre requête\n-> "))
-    process_requete("Afficher la liste des articles qui parlent des systèmes embarqués dans la rubrique Horizons Enseignement.")
+    process_requete("Je voudrais les articles qui parlent d’airbus ou du projet Taxibot.")
