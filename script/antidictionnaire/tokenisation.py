@@ -10,13 +10,16 @@ def segmente(xml_file, output_file):
             doc_id = document.find("article").text
             # Combiner titre + texte
             texte = (document.find("titre").text or "") + " " + (document.find("texte").text or "")
+            
             # Ajouter les légendes des images
-            images = document.find("images")
-            if images != None:
-                for image in images.findall("image"):
-                    texte += " " + image.find("legendeImage").text
+            #images = document.find("images")
+            #if images != None:
+            #    for image in images.findall("image"):
+            #        texte += " " + image.find("legendeImage").text
+            
             # trouver séquences de caractères alphanumériques entourées de "frontières de mot" (\b)
-            tokens = re.findall(r"\b\w+\b", texte.lower())
+            tokens = re.findall(r"\b[\w-]+\b", texte.lower())
+            
             # boucle pour l'écriture de tous les tokens
             for token in tokens:
                 f_out.write(f"{doc_id}\t{token}\n")
