@@ -1,3 +1,7 @@
+"""
+Le fichier d'index initialement utilisé pour débug notre correcteur
+"""
+
 être
 avoir
 développement

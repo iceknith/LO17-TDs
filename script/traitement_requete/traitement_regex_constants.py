@@ -1,10 +1,13 @@
+"""Définit les constantes qui seront utilisées pour le traitement des requêtes
+"""
+
 import regex as re
 
 ############
 ### DATE ###
 ############
 
-## Basic blocks ##
+## Block de bases ##
 
 r_year = "20[0-9]{2}"
 r_day = "[0-3]?[0-9]"
@@ -15,7 +18,7 @@ for m in months: r_month += f"{m}|"
 r_month = r_month[:-1] + ")"
 r_MONTH = "[0-1][0-9]"
 
-## Simple Dates ##
+## Dates simples ##
 
 r_year_date = r_year
 r_month_date = f"{r_month} {r_year}"
@@ -25,7 +28,7 @@ r_DAY_date = f"{r_DAY}/{r_MONTH}/{r_year}"
 
 r_date_raw = f"({r_year_date}|{r_month_date}|{r_day_date}|{r_MONTH_date}|{r_DAY_date}|{r_month})"
 
-## Sentences ##
+## Parties de phrases contenant des dates ##
 
 r_date_gt = f"(à partir de |après le |après ){r_date_raw}" # Greater than X
 r_date_eq = f"(de |de l'année |du |en ){r_date_raw}" # Equal X

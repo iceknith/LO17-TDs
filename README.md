@@ -3,5 +3,5 @@
 Pour lancer le programme tapez dans le terminal:
 `python main.py`
 
-Si vous voulez obtenir la liste des commandes disponnibles, tapez:
+Si vous voulez obtenir la liste des options disponnibles, tapez:
 `python main.py --help`

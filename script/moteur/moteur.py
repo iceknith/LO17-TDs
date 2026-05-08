@@ -1,3 +1,10 @@
+"""
+Le moteur de requête.
+Il prends une requête formatée par `traitement_requete.py`, 
+et il les transforme en un dictionnaire de contrainte (associant fichier inverse aux contraintes).
+Qu'il va ensuite appliquer sur les fichiers inverses, et nous donner la requête.
+"""
+
 import sys
 import os
 import regex as re
@@ -14,17 +21,43 @@ fichiers_inverses_path = "output/fichiers_inverses"
 ##################
 
 def month_to_MONTH(month:str) -> str:
+    """Convertis les mois au format month ("mai") au format MONTH ("05")
+
+    Args:
+        month (str): Le mois au format month à convertir.
+
+    Returns:
+        str: Le mois au format MONTH, converti.
+    """
     if month not in re_const.months: return "[0-1][0-9]" # Month not found, can be anything
     i = re_const.months.index(month)
     if i+1 < 10: return f"0{i+1}"
     else: return f"{i+1}"
 
 def day_to_DAY(day:str) -> str:
+    """Convertis les jours au format day ("9") au format DAY ("09")
+
+    Args:
+        day (str): Le jour au format day à convertir.
+
+    Returns:
+        str: Le jour au format DAY, converti.
+    """
     num = int(day)
     if num < 10: return f"0{day}"
     return day
 
 def date_to_regex(date:str) -> str:
+    """Convertis une date en format regex.
+    C'est à dire sous la forme "../../20..", où les ".." sont remplacées par des informations que l'on a.
+    Par exemple, la date "10 mai" se fera convertir en: "10/05/20..".
+
+    Args:
+        date (str): La date à convertir.
+
+    Returns:
+        str: La date au format regex, convertie.
+    """
     day = ".."
     month = ".."
     year = "20.."
@@ -61,7 +94,15 @@ def date_to_regex(date:str) -> str:
     return f"{day}/{month}/{year}"
 
 def is_later(date1:str, date2:str) -> bool:
-    """Returns true if Date2 >= Date2"""
+    """Compare deux date au format regex (décrit dans date_to_regex)
+
+    Args:
+        date1 (str): La date 1.
+        date2 (str): La date 2.
+
+    Returns:
+        bool: Si date2 >= date1.
+    """
     date_decomposed1 = date1.split("/")
     day1 = date_decomposed1[0]
     month1 = date_decomposed1[1]
@@ -85,7 +126,13 @@ def is_later(date1:str, date2:str) -> bool:
 ## Création Contraintes ##
 ##########################
     
-def create_date_contraintes(requete:dict, contraintes:dict) -> dict:
+def create_date_contraintes(requete:dict, contraintes:dict):
+    """Crée les contraintes de dates. Et les ajoute au dictionnaire de contraintes.
+
+    Args:
+        requete (dict): Requête formattée.
+        contraintes (dict): Dictionnaire de contraintes.
+    """
     contraintes_dates = []
     
     if requete.get("date_neg"): # !=
@@ -115,11 +162,23 @@ def create_date_contraintes(requete:dict, contraintes:dict) -> dict:
     if contraintes_dates != []:
         contraintes[f"{fichiers_inverses_path}/date.txt"] = contraintes_dates
 
-def create_rubrique_contraintes(requete:dict, contraintes:dict) -> list:
+def create_rubrique_contraintes(requete:dict, contraintes:dict):
+    """Crée les contraintes de rubriques. Et les ajoute au dictionnaire de contraintes.
+
+    Args:
+        requete (dict): Requête formattée.
+        contraintes (dict): Dictionnaire de contraintes.
+    """
     if requete.get("rubriques") is not None:
         contraintes[f"{fichiers_inverses_path}/rubrique.txt"] = requete.get("rubriques")
 
-def create_contenu_contraintes(requete:dict, contraintes:dict) -> list:
+def create_contenu_contraintes(requete:dict, contraintes:dict):
+    """Crée les contraintes de contenu. Et les ajoute au dictionnaire de contraintes.
+
+    Args:
+        requete (dict): Requête formattée.
+        contraintes (dict): Dictionnaire de contraintes.
+    """
     contraintes_contenu = []
     if requete.get("mots_clefs_generaux") is not None:
         contraintes_contenu = requete.get("mots_clefs_generaux")
@@ -132,11 +191,23 @@ def create_contenu_contraintes(requete:dict, contraintes:dict) -> list:
     
     contraintes[f"{fichiers_inverses_path}/texte.txt"] = contraintes_contenu
 
-def create_titre_contraintes(requete:dict, contraintes:dict) -> dict:
+def create_titre_contraintes(requete:dict, contraintes:dict):
+    """Crée les contraintes de titre. Et les ajoute au dictionnaire de contraintes.
+
+    Args:
+        requete (dict): Requête formattée.
+        contraintes (dict): Dictionnaire de contraintes.
+    """
     if requete.get("mots_clefs_titre") is not None:
         contraintes[f"{fichiers_inverses_path}/titre.txt"] = requete.get("mots_clefs_titre")
 
-def create_image_contraintes(requete:dict, contraintes:dict) -> dict:
+def create_image_contraintes(requete:dict, contraintes:dict):
+    """Crée les contraintes de présence d'image. Et les ajoute au dictionnaire de contraintes.
+
+    Args:
+        requete (dict): Requête formattée.
+        contraintes (dict): Dictionnaire de contraintes.
+    """
     if requete.get("image") is not None:
         # If we search for images, we search for documents that have more than one image
         if requete["image"]:
@@ -147,10 +218,24 @@ def create_image_contraintes(requete:dict, contraintes:dict) -> dict:
         else:
             contraintes[f"{fichiers_inverses_path}/image.txt"] = ["0"]
         
-def create_operateur_contraintes(requete:dict, contraintes:dict) -> dict:
+def create_operateur_contraintes(requete:dict, contraintes:dict):
+    """Crée les contraintes d'opérateurs. Et les ajoute au dictionnaire de contraintes.
+
+    Args:
+        requete (dict): Requête formattée.
+        contraintes (dict): Dictionnaire de contraintes.
+    """
     contraintes["ope"] = requete.get("operateurs", 'AND')
 
 def create_contraintes(requete:dict) -> dict:
+    """Crée le dictionnaire de contraintes.
+
+    Args:
+        requete (dict): Requête formattée.
+    
+    Returs
+        dict: Le dictionnaire de contraintes.
+    """
     contraintes = {}
     
     # Les contraintes sont de la forme "fichier inverse" : ["truc à rechercher"...]
@@ -168,6 +253,14 @@ def create_contraintes(requete:dict) -> dict:
 #############################
 
 def read_inverted_file(file_name:str) -> dict:
+    """Lit un fichier inverse et retourne les données obtenues.
+
+    Args:
+        file_name (str): Le nom du fichier inverse.
+
+    Returns:
+        dict: Les données du fichier inverse.
+    """ 
     resultat:dict = {}
     
     with open(file_name, "r") as f:
@@ -179,6 +272,17 @@ def read_inverted_file(file_name:str) -> dict:
     return resultat
 
 def apply_contrainte_to_file(file_data:dict, content:str, neg:bool=False, is_valid:callable=re.search) -> set[str]:
+    """Applique une contrainte à un fichier inverse.
+
+    Args:
+        file_data (dict): Les données du fichier inverse.
+        content (str): Le contenu de la contrainte.
+        neg (bool, optional): Si la contrainte est inversée. Defaults to False.
+        is_valid (callable, optional): La fonction calculant si la contrainte est valide. Defaults to re.search.
+
+    Returns:
+        set[str]: Les tokens qui sont valides d'après la contrainte.
+    """
     resultat:set = set()
     
     for token in file_data.keys():
@@ -188,16 +292,32 @@ def apply_contrainte_to_file(file_data:dict, content:str, neg:bool=False, is_val
     return resultat
 
 def apply_contrainte_to_token(token:str, content:str, neg:bool=False, is_valid:callable=re.search) -> bool:
+    """Applique une contrainte à un token. 
+
+    Args:
+        token (str): Le token à qui est appliqué la contrainte.
+        content (str): Le contenu de la contrainte.
+        neg (bool, optional): Si la contrainte est inversée. Defaults to False.
+        is_valid (callable, optional): La fonction calculant si la contrainte est valide. Defaults to re.search.
+
+    Returns:
+        bool: _description_
+    """
     result:bool = bool(is_valid(content, token))
     
     if neg: return not result
     else: return result
 
-def unification(liste1:set[str], liste2:set[str], ope:bool='AND') -> set[str]:
-    if ope == 'AND': return liste1.intersection(liste2)
-    if ope == 'OR': return liste1.union(liste2)
-
 def apply_contraintes(contraintes:dict) -> set[str]:
+    """Applique un ensemble de contraintes à la base de recherche.
+
+    Args:
+        contraintes (dict): L'ensemble de contraintes.
+
+    Returns:
+        set[str]: Le numéro des articles de l'ADIT qui valident ses contraintes.
+    """
+    
     resultat_and:set = None
     resultat_or:set = None
     default_ope = contraintes.pop('ope', 'AND')
@@ -234,14 +354,28 @@ def apply_contraintes(contraintes:dict) -> set[str]:
     
     return resultat
                 
+##########
+## Main ##
+##########
+
 _corpus = None
 
 def init():
+    """Charge le corpus en mémoire, pour ne pas avoir à la faire à chaque requête.
+    """
     global _corpus
     tree = ET.parse("output/articles.xml")
     _corpus = tree.getroot()
 
 def get_metadata(doc_id: str) -> dict:
+    """Retourne les metadatas trouvées pour un article.
+
+    Args:
+        doc_id (str): Le numéro de l'article.
+
+    Returns:
+        dict: L'ensemble des metadatas de cet article.
+    """
     for doc in _corpus.findall("document"):
         if doc.findtext("article", "").strip() == str(doc_id).strip():
             texte = doc.findtext("texte", "") or ""
@@ -255,27 +389,33 @@ def get_metadata(doc_id: str) -> dict:
             }
     return {"doc_id": doc_id, "titre": None, "date": None, "rubrique": None, "score": 1, "snippet": None}
 
-def rechercher(requete_str: str) -> list[dict]:
-    ids = process_requete(requete_str)
-    if not ids:
-        return []
-    return [get_metadata(doc_id) for doc_id in ids]
+def process_requete(requete_str:str) -> set[str]:
+    """Exécute une requête, et retourne la liste des numéros des articles trouvés.
 
-##########
-## Main ##
-##########
+    Args:
+        requete_str (str): La requête.
 
-def process_requete(requete_str:str) -> list[str]:
+    Returns:
+        set[str]: La liste des numéros des articles trouvés.
+    """
     requete:dict = traite_requete(requete_str)
     contraintes:dict = create_contraintes(requete)
-    resultat:list[str] = apply_contraintes(contraintes)
-    # debug display
+    resultat:set[str] = apply_contraintes(contraintes)
+    # Option de debug
     if __name__ == "__main__":
         print(f"Requête: {requete}")
         print(f"Contraintes: {contraintes}")
         print(f"Résultat: {resultat}")
     return resultat
 
-if __name__ == "__main__":
-    #process_requete(input("Entrez votre requête\n-> "))
-    process_requete("Je veux les articles aviation avec image.")
+def rechercher(requete_str: str) -> list[dict]:
+    """Execute une requête, et retourne la liste des métadatas des articles trouvés.
+
+    Args:
+        requete_str (str): La requête.
+
+    Returns:
+        list[dict]: La liste des métadatas.
+    """
+    ids = process_requete(requete_str)
+    return [get_metadata(doc_id) for doc_id in ids]

@@ -1,7 +1,15 @@
+"""
+Gère l'interface utilisateur console.
+"""
+
 import moteur
 
-
 def afficher_resultats(resultats: list[dict]) -> None:
+    """Affiche les résultats pour l'utilisateur
+
+    Args:
+        resultats (list[dict]): La liste des données des résultats.
+    """
     if not resultats:
         print("\n  [Aucun document trouvé.]\n")
         return
@@ -22,6 +30,11 @@ def afficher_resultats(resultats: list[dict]) -> None:
 
 
 def choisir_tri() -> str:
+    """Affiche à l'utilisateur un prompt lui demandant de choisir la méthode de tri qu'il préfère
+
+    Returns:
+        str: La réponse de l'utilisateur (pas forcément 1,2 ou 3)
+    """
     print("\n  Trier les résultats par :")
     print("  [1] Pertinence (défaut)")
     print("  [2] Date croissante")
@@ -31,6 +44,15 @@ def choisir_tri() -> str:
 
 
 def trier_resultats(resultats: list[dict], choix: str) -> list[dict]:
+    """Trie les résultats selon le choix de l'utilisateur
+    
+    Args:
+        resultats (list[dict]): La liste des données des résultats.
+        choix (str): Le choix de tri de l'utilisateur.
+    
+    Returns
+        list[dict]: La liste des données des résultats triée.
+    """
     if choix == "2":
         return sorted(resultats, key=lambda r: r["date"] or "")
     elif choix == "3":
@@ -40,6 +62,8 @@ def trier_resultats(resultats: list[dict], choix: str) -> list[dict]:
 
 
 def afficher_aide() -> None:
+    """Affiche le prompt d'aide.
+    """
     print("""
   Exemples de requêtes :
     cnrs innovation
@@ -53,6 +77,10 @@ def afficher_aide() -> None:
 
 
 def main() -> None:
+    """
+    La boucle principale de l'interface console.
+    """
+    
     print("\n  Moteur de recherche — Archive ADIT")
     print("  LO17 · Indexation et Recherche d'information")
     print("  Tapez 'aide' pour la liste des commandes.\n")
@@ -78,11 +106,9 @@ def main() -> None:
         print("  Recherche en cours…")
         resultats = moteur.rechercher(requete)
 
-        choix = ""
         if resultats:
-            choix = choisir_tri()
-        
-        resultats = trier_resultats(resultats, choix)
+            resultats = trier_resultats(resultats, choisir_tri())
+            
         afficher_resultats(resultats)
 
 if __name__ == "__main__":

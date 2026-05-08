@@ -1,3 +1,7 @@
+"""
+Parse les informations importantes des bulletins de l'ADIT et les compile dans un fichier de corpus XML.
+"""
+
 from bs4 import BeautifulSoup
 from bs4 import Tag
 import xml.etree.cElementTree as ET
@@ -7,6 +11,12 @@ import os
 import html
 
 def parse_bulletin_titre(file_parser:BeautifulSoup, document:ET.Element) -> None:
+    """Parse les titre des bulletins
+
+    Args:
+        file_parser (BeautifulSoup): Le parseur sur le corpus de l'ADIT.
+        document (ET.Element): Le document xml crée.
+    """
     tag = file_parser.find("title")
     if tag:
         text = tag.getText().split(">")
@@ -21,6 +31,12 @@ def parse_bulletin_titre(file_parser:BeautifulSoup, document:ET.Element) -> None
         raise ValueError("No title has been found in the current document !")
 
 def parse_date(file_parser:BeautifulSoup, document:ET.Element) -> None:
+    """Parse les dates des bulletins
+
+    Args:
+        file_parser (BeautifulSoup): Le parseur sur le corpus de l'ADIT.
+        document (ET.Element): Le document xml crée.
+    """
     tags_txt:Tag = file_parser.find("span", class_="style42")
     if tags_txt:        
         date = ET.SubElement(document, "date")
@@ -29,6 +45,12 @@ def parse_date(file_parser:BeautifulSoup, document:ET.Element) -> None:
     else: raise ValueError("No date has been found in the current document !")
 
 def parse_auteur(file_parser:BeautifulSoup, document:ET.Element) -> None:
+    """Parse les auteurs des bulletins
+
+    Args:
+        file_parser (BeautifulSoup): Le parseur sur le corpus de l'ADIT.
+        document (ET.Element): Le document xml crée.
+    """
     tags = file_parser.find_all("tr")
     for tag in tags:
         if ("rédacteur" in tag.text.lower()) and not tag.find("tr"): # Le plus petit tr avec redacteur
@@ -42,10 +64,22 @@ def parse_auteur(file_parser:BeautifulSoup, document:ET.Element) -> None:
     raise ValueError("No author has been found in the current document !")
 
 def parse_article(file_name:str, document:ET.Element):
+    """Parse le numéro des articles des bulletins
+
+    Args:
+        file_parser (BeautifulSoup): Le parseur sur le corpus de l'ADIT.
+        document (ET.Element): Le document xml crée.
+    """
     article = ET.SubElement(document, "article")
     article.text = file_name.split("/")[-1].split(".")[0]
 
 def parse_rubriques(file_parser:BeautifulSoup, document:ET.Element) -> None:
+    """Parse les rubriques des bulletins
+
+    Args:
+        file_parser (BeautifulSoup): Le parseur sur le corpus de l'ADIT.
+        document (ET.Element): Le document xml crée.
+    """
     tag_td:Tag = file_parser.find("td", class_="FWExtra2")
     if tag_td:
         tag_rubrique = tag_td.find("span", class_="style42")
@@ -57,6 +91,12 @@ def parse_rubriques(file_parser:BeautifulSoup, document:ET.Element) -> None:
         raise ValueError("No rubrique container (same as text container) has been found in the current document !")
 
 def parse_texte(file_parser:BeautifulSoup, document:ET.Element) -> None:
+    """Parse les contenus du texte des bulletins
+
+    Args:
+        file_parser (BeautifulSoup): Le parseur sur le corpus de l'ADIT.
+        document (ET.Element): Le document xml crée.
+    """
     tag_td:Tag = file_parser.find("td", class_="FWExtra2")
     if tag_td:
         tags_txt = tag_td.find("span", class_="style95")
@@ -70,6 +110,12 @@ def parse_texte(file_parser:BeautifulSoup, document:ET.Element) -> None:
     else: raise ValueError("No text container has been found in the current document !")
  
 def parse_images(file_parser:BeautifulSoup, document:ET.Element) -> None:
+    """Parse les images des bulletins
+
+    Args:
+        file_parser (BeautifulSoup): Le parseur sur le corpus de l'ADIT.
+        document (ET.Element): Le document xml crée.
+    """
     tags:Tag = file_parser.find_all("div", style="text-align: center")
     
     images_doc = ET.SubElement(document, "images")
@@ -86,22 +132,14 @@ def parse_images(file_parser:BeautifulSoup, document:ET.Element) -> None:
             
             url_doc.text = "/IMAGESWEB" + image["src"].split("IMAGESWEB")[-1]
             legende_doc.text = html.unescape(legende.text)
-        """
-        if image.get("src") and not (image["src"] in urls): 
-            image_doc = ET.SubElement(images_doc, "image")
-            url_doc = ET.SubElement(image_doc, "urlImage")
-            url_doc.text = image["src"]
-            urls.append(image["src"])
-
-            if image.get("name"):
-                legende_doc = ET.SubElement(image_doc, "legendeImage")
-                legende_doc.text = image["name"]
-            elif image.get("alt"):
-                legende_doc = ET.SubElement(image_doc, "legendeImage")
-                legende_doc.text = image["alt"]
-        """
         
 def parse_contact(file_parser:BeautifulSoup, document:ET.Element) -> None:
+    """Parse les contacts des bulletins
+
+    Args:
+        file_parser (BeautifulSoup): Le parseur sur le corpus de l'ADIT.
+        document (ET.Element): Le document xml crée.
+    """
     tags_td:Tag = file_parser.find_all("td", class_="FWExtra2")
     for tag_td in tags_td:
         tag_p = tag_td.find("p", class_="style44")
@@ -119,6 +157,13 @@ def parse_contact(file_parser:BeautifulSoup, document:ET.Element) -> None:
     raise ValueError("No contact has been found in the current document !")
 
 def parse_file(file_name:str, document:ET.Element):
+    """Parse un fichier d'un bulletin.
+    Pour ce faire, appelle toutes les fonction de parsing des différentes données, présentes ci-dessus.
+
+    Args:
+        file_parser (BeautifulSoup): Le parseur sur le corpus de l'ADIT.
+        document (ET.Element): Le document xml crée.
+    """
     with open(file_name, encoding="utf-8") as file_:
         file_parser = BeautifulSoup(file_, "html.parser", from_encoding="utf-8")
         
@@ -130,14 +175,13 @@ def parse_file(file_name:str, document:ET.Element):
         parse_texte(file_parser, document)
         parse_images(file_parser, document)
         parse_contact(file_parser, document)
-        
-
-def debug():
-    document = ET.Element("debug")
-    parse_file("BULLETINS/75457.htm", document)
-    print(ET.tostring(document))
 
 def parse_every_file(folder_name:str):
+    """Parse tout les fichier de l'ADIT
+
+    Args:
+        folder_name (str): Le dossier dans les fichier .html de l'ADIT sont stockés.
+    """
     corpus = ET.Element("corpus")
     tree = ET.ElementTree(corpus)
     
@@ -151,7 +195,9 @@ def parse_every_file(folder_name:str):
 
 
 def main():
-    #debug()
+    """
+    Parse les informations importantes des bulletins de l'ADIT et les compile dans un fichier de corpus XML.
+    """
     parse_every_file("BULLETINS")
 
 
