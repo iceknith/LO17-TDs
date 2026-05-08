@@ -1,9 +1,11 @@
 import sys
 import os
 import regex as re
-if __name__ == "__main__": sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
-
-import traitement_requete.traitement_regex_constants as re_const
+if __name__ == "__main__": 
+    import traitement_regex_constants as re_const
+    sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
+else:
+    import traitement_requete.traitement_regex_constants as re_const
 import correcteur_orthographique.correcteur_orthographique as correcteur
 
 def load_rubriques(f_inverse_rubrique_file:str="output/fichiers_inverses/rubrique.txt") -> list[str]:
