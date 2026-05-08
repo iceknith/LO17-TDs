@@ -4,6 +4,7 @@ import regex as re
 sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]) + "")
 import traitement_requete.traitement_regex_constants as re_const
 from traitement_requete.traitement_requete import traite_requete
+import xml.etree.ElementTree as ET
 
 
 fichiers_inverses_path = "output/fichiers_inverses"
@@ -233,6 +234,32 @@ def apply_contraintes(contraintes:dict) -> set[str]:
     
     return resultat
                 
+_corpus = None
+
+def init():
+    global _corpus
+    tree = ET.parse("output/articles.xml")
+    _corpus = tree.getroot()
+
+def get_metadata(doc_id: str) -> dict:
+    for doc in _corpus.findall("document"):
+        if doc.findtext("article", "").strip() == str(doc_id).strip():
+            texte = doc.findtext("texte", "") or ""
+            return {
+                "doc_id":   doc_id,
+                "titre":    (doc.findtext("titre", "") or "").strip(),
+                "date":     (doc.findtext("date", "") or "").strip(),
+                "rubrique": (doc.findtext("rubrique", "") or "").strip(),
+                "score":    1,
+                "snippet":  texte[:200].strip(),
+            }
+    return {"doc_id": doc_id, "titre": None, "date": None, "rubrique": None, "score": 1, "snippet": None}
+
+def rechercher(requete_str: str) -> list[dict]:
+    ids = process_requete(requete_str)
+    if not ids:
+        return []
+    return [get_metadata(doc_id) for doc_id in ids]
 
 ##########
 ## Main ##
