@@ -419,3 +419,6 @@ def rechercher(requete_str: str) -> list[dict]:
     """
     ids = process_requete(requete_str)
     return [get_metadata(doc_id) for doc_id in ids]
+
+if __name__ == "__main__":
+    process_requete("J’aimerais la liste des articles écrits après janvier 2014 et qui parlent d’informatique ou de télécommunications.")
