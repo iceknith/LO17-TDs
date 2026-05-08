@@ -267,12 +267,13 @@ def rechercher(requete_str: str) -> list[dict]:
 
 def process_requete(requete_str:str) -> list[str]:
     requete:dict = traite_requete(requete_str)
-    print(f"Requête: {requete}")
     contraintes:dict = create_contraintes(requete)
-    #contraintes:dict = create_contraintes({'date_min': '3 mars 2013', 'date_max': '4 mai 2013'})
-    print(f"Contraintes: {contraintes}")
     resultat:list[str] = apply_contraintes(contraintes)
-    print(f"Résultat: {resultat}")
+    # debug display
+    if __name__ == "__main__":
+        print(f"Requête: {requete}")
+        print(f"Contraintes: {contraintes}")
+        print(f"Résultat: {resultat}")
     return resultat
 
 if __name__ == "__main__":
