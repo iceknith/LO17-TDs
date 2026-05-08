@@ -89,9 +89,6 @@ def extract_logical_operators(entree:str, resultat:dict) -> str:
     return entree
 
 def replace_stop_words(entree:str) -> str:
-    #stop_words = ["je", "afficher", "voudrais"]
-    #for stop_word in stop_words:
-    #    entree = re.sub(r"" + stop_word + r"\b", "", entree)
     return re.sub(re_const.r_ponctuation, "", re.sub(re_const.r_stopprefixes, "", re.sub(re_const.r_stopwords, "", entree)))
 
 def extract_mots_clefs(entree:str, resultat:dict) -> str:
@@ -147,5 +144,6 @@ def main() -> None:
 rubriques = load_rubriques()
 
 if __name__ == "__main__":
+    print(traite_requete("Je veux les articles sans image"))
     main()
     

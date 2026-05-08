@@ -126,7 +126,7 @@ def create_contenu_contraintes(requete:dict, contraintes:dict) -> list:
     if requete.get("mots_clefs_negatifs") is not None:
         for mot_neg in requete.get("mots_clefs_negatifs"):
             contraintes_contenu.append(
-                {'neg':True, 'ope':'AND', 'is_valid':re.search, 'content':mot_neg}
+                {'neg':True, 'is_valid':re.search, 'content':mot_neg}
             )
     
     contraintes[f"{fichiers_inverses_path}/texte.txt"] = contraintes_contenu
@@ -137,7 +137,14 @@ def create_titre_contraintes(requete:dict, contraintes:dict) -> dict:
 
 def create_image_contraintes(requete:dict, contraintes:dict) -> dict:
     if requete.get("image") is not None:
-        contraintes[f"{fichiers_inverses_path}/images.txt"] = [requete.get("image")]
+        # If we search for images, we search for documents that have more than one image
+        if requete["image"]:
+            contraintes[f"{fichiers_inverses_path}/image.txt"] = [
+                {'neg':True, 'is_valid':re.search, 'content':"0"}
+            ]
+        # If we don"t search for images
+        else:
+            contraintes[f"{fichiers_inverses_path}/image.txt"] = ["0"]
         
 def create_operateur_contraintes(requete:dict, contraintes:dict) -> dict:
     contraintes["ope"] = requete.get("operateurs", 'AND')
@@ -243,4 +250,4 @@ def process_requete(requete_str:str) -> list[str]:
 
 if __name__ == "__main__":
     #process_requete(input("Entrez votre requête\n-> "))
-    process_requete("J’aimerais la liste des articles écrits après janvier 2014 et qui parlent d’informatique ou de télécommunications.")
+    process_requete("Je veux les articles aviation avec image.")
