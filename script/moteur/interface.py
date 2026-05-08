@@ -78,8 +78,12 @@ def main() -> None:
         print("  Recherche en cours…")
         resultats = moteur.rechercher(requete)
 
+        choix = ""
         if resultats:
             choix = choisir_tri()
+        
+        resultats = trier_resultats(resultats, choix)
+        afficher_resultats(resultats)
 
 if __name__ == "__main__":
     main()
