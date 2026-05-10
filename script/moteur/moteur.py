@@ -12,6 +12,7 @@ sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]) + "")
 import traitement_requete.traitement_regex_constants as re_const
 from traitement_requete.traitement_requete import traite_requete
 import xml.etree.ElementTree as ET
+import time
 
 
 fichiers_inverses_path = "output/fichiers_inverses"
@@ -181,13 +182,17 @@ def create_contenu_contraintes(requete:dict, contraintes:dict):
     """
     contraintes_contenu = []
     if requete.get("mots_clefs_generaux") is not None:
-        contraintes_contenu = requete.get("mots_clefs_generaux")
+        for mot in requete.get("mots_clefs_generaux"):
+            contraintes_contenu.append({'ope': 'AND', 'content': mot, 'is_valid': re.search})
     
     if requete.get("mots_clefs_negatifs") is not None:
         for mot_neg in requete.get("mots_clefs_negatifs"):
             contraintes_contenu.append(
-                {'neg':True, 'is_valid':re.search, 'content':mot_neg}
+                {'neg':True, 'ope':'AND', 'is_valid':re.search, 'content':mot_neg}
             )
+    
+    if contraintes_contenu:
+        contraintes[f"{fichiers_inverses_path}/texte.txt"] = contraintes_contenu
     
     contraintes[f"{fichiers_inverses_path}/texte.txt"] = contraintes_contenu
 
@@ -390,6 +395,7 @@ def get_metadata(doc_id: str) -> dict:
     return {"doc_id": doc_id, "titre": None, "date": None, "rubrique": None, "score": 1, "snippet": None}
 
 def process_requete(requete_str:str) -> set[str]:
+    start = time.time()
     """Exécute une requête, et retourne la liste des numéros des articles trouvés.
 
     Args:
@@ -406,6 +412,7 @@ def process_requete(requete_str:str) -> set[str]:
         print(f"Requête: {requete}")
         print(f"Contraintes: {contraintes}")
         print(f"Résultat: {resultat}")
+    print(f"Temps de réponse : {time.time() - start:.3f}s")
     return resultat
 
 def rechercher(requete_str: str) -> list[dict]:
