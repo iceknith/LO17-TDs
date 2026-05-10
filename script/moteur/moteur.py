@@ -425,4 +425,6 @@ def rechercher(requete_str: str) -> list[dict]:
         list[dict]: La liste des métadatas.
     """
     ids = process_requete(requete_str)
-    return [get_metadata(doc_id) for doc_id in ids]
+    if ids:
+        return [get_metadata(doc_id) for doc_id in ids]
+    return []
